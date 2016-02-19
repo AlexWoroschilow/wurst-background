@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../../lib/perl";
+use Config::Simple;
+
+my $cfg = new Config::Simple("$FindBin::Bin/../../etc/merge/merge.cnf");
+
+my $cluster1 = $cfg->param("sources.clustera");
+my $cluster2 = $cfg->param("sources.clusters");
+
+my $graph1 = $cfg->param("sources.grapha");
+my $graph2 = $cfg->param("sources.graphs");
+
+my $result1 = $cfg->param("sources.resulta");
+my $result2 = $cfg->param("sources.results");
+
+
+my $starter1 = $cfg->param("bin.startera");
+my $starter2 = $cfg->param("bin.starters");
+
+system("nohup $starter1 $cluster1 $cluster2 $graph1 $graph2 > $result1 2>&1 &");
+system("nohup $starter2 $cluster1 $cluster2 $graph1 $graph2 > $result2 2>&1 &");
+
+print('50configmerge')
+

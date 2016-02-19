@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../../lib/perl";
+use Config::Simple;
+
+sub file_exists {
+	my $file = shift;
+	return ( ( -d $file ) || ( -e $file ) );
+}
+
+sub check_config {
+	my $file = shift;
+
+	my $cfg = new Config::Simple($file);
+
+	if ( !file_exists( $cfg->param("sources.graph") ) ) {
+		return 0;
+	}
+
+	if ( !file_exists( $cfg->param("bin.starter") ) ) {
+		return 0;
+	}
+	
+	return 1;
+}
+
+my $config1 = "$FindBin::Bin/../../etc/cluster/clustera.cnf";
+my $config2 = "$FindBin::Bin/../../etc/cluster/clusters.cnf";
+
+if ( !check_config($config1) || !check_config($config2) ) {
+	exit( print('ready') );
+}
+
+exit( print('done') );

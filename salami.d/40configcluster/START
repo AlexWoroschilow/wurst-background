@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+use FindBin;
+use lib "$FindBin::Bin/../../lib/perl";
+use Config::Simple;
+
+
+my $config1 = "$FindBin::Bin/../../etc/cluster/clustera.cnf";
+my $config2 = "$FindBin::Bin/../../etc/cluster/clusters.cnf";
+
+my $cfg1 = new Config::Simple($config1);
+my $cfg2 = new Config::Simple($config2);
+
+$cfg1->param("sources.graph", "/home/stud2013/ovoroshylov/Clustering/wurst-background/var/graph/aacid.ncol");
+$cfg2->param("sources.graph", "/home/stud2013/ovoroshylov/Clustering/wurst-background/var/cluster/aacid.clust");
+
+$cfg1->param("sources.graph", "/home/stud2013/ovoroshylov/Clustering/wurst-background/var/graph/salami.ncol");
+$cfg2->param("sources.graph", "/home/stud2013/ovoroshylov/Clustering/wurst-background/var/cluster/salami.clust");
+
+$cfg1->write( $opt->get_config );
+$cfg2->write( $opt->get_config );
+
+
+print('done')
+

@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../../lib/perl";
+use Config::Simple;
+
+sub file_exists {
+	my $file = shift;
+	return ( ( -d $file ) || ( -e $file ) );
+}
+
+sub check_config {
+	my $file = shift;
+
+	my $cfg = new Config::Simple($file);
+
+	if ( !file_exists( $cfg->param("bin.startera") ) ) {
+		return 0;
+	}
+
+	if ( !file_exists( $cfg->param("bin.starters") ) ) {
+		return 0;
+	}
+
+	if ( !file_exists( $cfg->param("sources.grapha") ) ) {
+		return 0;
+	}
+
+	if ( !file_exists( $cfg->param("sources.graphs") ) ) {
+		return 0;
+	}
+
+	if ( !file_exists( $cfg->param("sources.clustera") ) ) {
+		return 0;
+	}
+
+	if ( !file_exists( $cfg->param("sources.clusters") ) ) {
+		return 0;
+	}
+
+	if ( !file_exists( $cfg->param("sources.resulta") ) ) {
+		return 0;
+	}
+
+	if ( !file_exists( $cfg->param("sources.results") ) ) {
+		return 0;
+	}
+
+	return 1;
+}
+
+if ( !check_config("$FindBin::Bin/../../etc/merge/merge.cnf") ) {
+	exit( print('ready') );
+}
+
+exit( print('done') );

@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../../lib/perl";
+use Config::Simple;
+
+sub file_exists {
+	my $file = shift;
+	return ( ( -d $file ) || ( -e $file ) );
+}
+
+sub is_input_exists {
+	my $file = shift;
+
+	my $cfg = new Config::Simple($file);
+
+	return file_exists( $cfg->param("sources.imbiss") );
+}
+
+sub is_output_exists {
+	my $file = shift;
+	my $cfg  = new Config::Simple($file);
+	return file_exists( $cfg->param("sources.graph") );
+}
+
+my $config1 = "$FindBin::Bin/../../etc/graph/grapha.cnf";
+my $config2 = "$FindBin::Bin/../../etc/graph/graphs.cnf";
+
+if ( is_output_exists($config1) && is_output_exists($config2) ) {
+	exit( print('done') );
+}
+
+if ( is_input_exists($config1) && is_input_exists($config2) ) {
+	exit( print('ready') );
+}
+
+exit( print('wait') );

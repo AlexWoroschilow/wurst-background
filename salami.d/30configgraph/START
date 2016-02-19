@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../../lib/perl";
+use Getopt::Lucid qw( :all );
+use Config::Simple;
+
+my @specs1 = (
+	Param("--config")
+	  ->default("$FindBin::Bin/../../etc/graph/grapha.cnf"),
+);
+
+my @specs2 = (
+	Param("--config")
+	  ->default("$FindBin::Bin/../../etc/graph/graphs.cnf"),
+);
+
+# Parse and validate given parameters
+my $opt1 = Getopt::Lucid->getopt( \@specs1 );
+my $opt2 = Getopt::Lucid->getopt( \@specs2 );
+
+$opt1->validate( { 'requires' => [] } );
+$opt2->validate( { 'requires' => [] } );
+
+my $cfg1 = new Config::Simple( $opt1->get_config );
+my $cfg2 = new Config::Simple( $opt2->get_config );
+
+$cfg1->param("sources.imbiss", "/home/stud2013/ovoroshylov/Clustering/wurst-background/var/imbiss/aacid.csv");
+$cfg2->param("sources.imbiss", "/home/stud2013/ovoroshylov/Clustering/wurst-background/var/imbiss/salami.csv");
+
+$cfg1->write( $opt1->get_config );
+$cfg2->write( $opt2->get_config );
+
+unlink $cfg1->param("sources.graph");
+unlink $cfg2->param("sources.graph");
+
+exit( print('done') );

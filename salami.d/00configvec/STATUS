@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../../lib/perl";
+use Getopt::Lucid qw( :all );
+use Config::Simple;
+
+sub check_config {
+	my $file = shift;
+
+	my @specs = ( Param("--config")->default($file) );
+	my $opt   = Getopt::Lucid->getopt( \@specs );
+	$opt->validate( { 'requires' => [] } );
+	my $cfg = new Config::Simple( $opt->get_config );
+
+	my $current = time();
+	my $updated = $cfg->param("background.updated");
+	if ( $updated && ( $current - $updated ) < ( 60 * 60 * 12 ) ) {
+		return 1;
+	}
+	return 0;
+}
+
+my $config = "$FindBin::Bin/../../etc/salami/buildvec.cnf";
+if ( check_config($config) ) {
+	exit( print('done') );
+}
+exit( print('ready') )

@@ -1,0 +1,9 @@
+; Config::Simple 4.59
+; Fri Feb 19 15:20:41 2016
+
+[sources]
+graph=/home/stud2013/ovoroshylov/Clustering/wurst-background/var/graph/salami.ncol
+cluster=/home/stud2013/ovoroshylov/Clustering/wurst-background/var/cluster/salami.clust
+
+[bin]
+starter=/home/stud2013/ovoroshylov/Clustering/wurst-cluster/clustering_salami.sh

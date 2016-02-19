@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../../lib/perl";
+use Config::Simple;
+
+sub file_exists {
+	my $file = shift;
+	return ( ( -d $file ) || ( -e $file ) );
+}
+
+sub check_background_process {
+	my $file = shift;
+
+	return 0;
+}
+
+sub is_background_process_sge {
+	my $file    = shift;
+	my $cfg     = new Config::Simple($file);
+	my $starter = $cfg->param("bin.starter");
+	my $name    = substr( $starter, rindex( $starter, "/" ) + 1 );
+
+	my $result = `qstat -r -ext`;
+
+	return ( index( $result, $name ) > -1 );
+}
+
+sub is_config_correct {
+	my $file = shift;
+
+	my $cfg = new Config::Simple($file);
+
+	if ( !file_exists( $cfg->param("sources.cluster") ) ) {
+		return 0;
+	}
+
+	return 1;
+}
+
+
+my $config1 = "$FindBin::Bin/../../etc/cluster/clustera.cnf";
+my $config2 = "$FindBin::Bin/../../etc/cluster/clusters.cnf";
+
+if (   is_background_process_sge($config1)
+	&& is_background_process_sge($config2) ) {
+	exit( print('wait') );
+}
+
+if (   check_background_process($config1)
+	&& check_background_process($config2) ) {
+	exit( print('wait') );
+}
+
+if ( !is_config_correct($config1) || !is_config_correct($config2) ) {
+	exit( print('ready') );
+}
+
+exit( print('done') );
