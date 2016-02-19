@@ -7,30 +7,31 @@ use lib "$FindBin::Bin/../../lib/perl";
 use Getopt::Lucid qw( :all );
 use Config::Simple;
 
-sub check_config {
+sub file_exists {
 	my $file = shift;
+	return ( ( -d $file ) || ( -e $file ) );
+}
 
-	my @specs = ( Param("--config")->default($file) );
-	my $opt   = Getopt::Lucid->getopt( \@specs );
-	$opt->validate( { 'requires' => [] } );
-	my $cfg = new Config::Simple( $opt->get_config );
+sub is_config_correct {
+	my $file = shift;
+	my $cfg  = new Config::Simple($file);
+	return file_exists( $cfg->param("sources.imbiss") );
+}
 
-	my $imbiss = $cfg->param("sources.imbiss");
-	if ( !( ( -d $imbiss ) || ( -e $imbiss ) ) ) {
-		return 0;
+sub main {
+	my $config1 = shift;
+	my $config2 = shift;
+
+	if ( !is_config_correct($config1) || !is_config_correct($config2) ) {
+		return "ready";
 	}
-
-#	my $graph = $cfg->param("sources.graph");
-#	if ( ( ( -d $graph ) || ( -e $graph ) ) ) {
-#		return 0;
-#	}
-	return 1;
+	return "done";
 }
-
-my $config1 = "$FindBin::Bin/../../etc/graph/grapha.cnf";
-my $config2 = "$FindBin::Bin/../../etc/graph/graphs.cnf";
-
-if ( !check_config($config1) || !check_config($config2) ) {
-	exit( print('ready') );
-}
-exit( print('done') );
+exit(
+	print(
+		main(
+			"$FindBin::Bin/../../etc/graph/grapha.cnf",
+			"$FindBin::Bin/../../etc/graph/graphs.cnf"
+		)
+	)
+);

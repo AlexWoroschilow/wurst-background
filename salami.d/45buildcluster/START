@@ -4,22 +4,33 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use Config::Simple;
 
-my $config1 = "$FindBin::Bin/../../etc/cluster/clustera.cnf";
-my $config2 = "$FindBin::Bin/../../etc/cluster/clusters.cnf";
+sub main {
+	my $config1 = shift;
+	my $config2 = shift;
 
-my $cfg1 = new Config::Simple($config1);
-my $cfg2 = new Config::Simple($config2);
+	my $cfg1 = new Config::Simple($config1);
+	my $cfg2 = new Config::Simple($config2);
 
-my $starter1 = $cfg1->param("bin.starter");
-my $starter2 = $cfg2->param("bin.starter");
+	my $starter1 = $cfg1->param("bin.starter");
+	my $starter2 = $cfg2->param("bin.starter");
 
-my $graph1 = $cfg1->param("sources.graph");
-my $graph2 = $cfg2->param("sources.graph");
+	my $graph1 = $cfg1->param("sources.graph");
+	my $graph2 = $cfg2->param("sources.graph");
 
-my $cluster1 = $cfg1->param("sources.cluster");
-my $cluster2 = $cfg2->param("sources.cluster");
+	my $cluster1 = $cfg1->param("sources.cluster");
+	my $cluster2 = $cfg2->param("sources.cluster");
 
-system("nohup $starter1 $graph1 $cluster1 >/dev/null 2>&1 &");
-system("nohup $starter2 $graph2 $cluster2 >/dev/null 2>&1 &");
+	system("nohup $starter1 $graph1 $cluster1 >/dev/null 2>&1 &");
+	system("nohup $starter2 $graph2 $cluster2 >/dev/null 2>&1 &");
 
-print('done');
+	return "done";
+}
+
+exit(
+	print(
+		main(
+			"$FindBin::Bin/../../etc/cluster/clustera.cnf",
+			"$FindBin::Bin/../../etc/cluster/clusters.cnf"
+		)
+	)
+);

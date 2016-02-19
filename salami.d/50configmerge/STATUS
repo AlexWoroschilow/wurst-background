@@ -11,7 +11,7 @@ sub file_exists {
 	return ( ( -d $file ) || ( -e $file ) );
 }
 
-sub check_config {
+sub is_config_correct {
 	my $file = shift;
 
 	my $cfg = new Config::Simple($file);
@@ -51,8 +51,15 @@ sub check_config {
 	return 1;
 }
 
-if ( !check_config("$FindBin::Bin/../../etc/merge/merge.cnf") ) {
-	exit( print('ready') );
+sub main {
+	my $config = shift;
+
+	if ( !is_config_correct($config) ) {
+		exit( print('ready') );
+	}
+
+	return "done";
 }
 
-exit( print('done') );
+exit( print( main("$FindBin::Bin/../../etc/merge/merge.cnf") ) );
+

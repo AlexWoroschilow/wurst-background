@@ -40,22 +40,36 @@ sub is_config_correct {
 	return 1;
 }
 
+sub main {
+	my $config1 = shift;
+	my $config2 = shift;
 
-my $config1 = "$FindBin::Bin/../../etc/cluster/clustera.cnf";
-my $config2 = "$FindBin::Bin/../../etc/cluster/clusters.cnf";
+	if (   is_background_process_sge($config1)
+		&& is_background_process_sge($config2) )
+	{
+		return "wait";
+	}
 
-if (   is_background_process_sge($config1)
-	&& is_background_process_sge($config2) ) {
-	exit( print('wait') );
+	if (   check_background_process($config1)
+		&& check_background_process($config2) )
+	{
+		return "wait";
+	}
+
+	if ( !is_config_correct($config1) || !is_config_correct($config2) ) {
+		return "ready";
+	}
+
+	return "done";
+
 }
 
-if (   check_background_process($config1)
-	&& check_background_process($config2) ) {
-	exit( print('wait') );
-}
+exit(
+	print(
+		main(
+			"$FindBin::Bin/../../etc/cluster/clustera.cnf",
+			"$FindBin::Bin/../../etc/cluster/clusters.cnf"
+		)
+	)
+);
 
-if ( !is_config_correct($config1) || !is_config_correct($config2) ) {
-	exit( print('ready') );
-}
-
-exit( print('done') );

@@ -11,27 +11,29 @@ sub file_exists {
 	return ( ( -d $file ) || ( -e $file ) );
 }
 
-sub check_config {
+sub is_config_correct {
 	my $file = shift;
 
 	my $cfg = new Config::Simple($file);
-
-	if ( !file_exists( $cfg->param("sources.graph") ) ) {
-		return 0;
-	}
-
-	if ( !file_exists( $cfg->param("bin.starter") ) ) {
-		return 0;
-	}
-	
-	return 1;
+	return file_exists( $cfg->param("sources.graph") )
+	  && file_exists( $cfg->param("bin.starter") );
 }
 
-my $config1 = "$FindBin::Bin/../../etc/cluster/clustera.cnf";
-my $config2 = "$FindBin::Bin/../../etc/cluster/clusters.cnf";
+sub main {
+	my $config1 = shift;
+	my $config2 = shift;
 
-if ( !check_config($config1) || !check_config($config2) ) {
-	exit( print('ready') );
+	if ( !is_config_correct($config1) || !is_config_correct($config2) ) {
+		return "ready";
+	}
+	return "done";
 }
 
-exit( print('done') );
+exit(
+	print(
+		main(
+			"$FindBin::Bin/../../etc/cluster/clustera.cnf",
+			"$FindBin::Bin/../../etc/cluster/clusters.cnf"
+		)
+	)
+);
