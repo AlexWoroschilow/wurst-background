@@ -1,36 +1,36 @@
 ; Config::Simple 4.59
-; Fri Feb 19 16:46:53 2016
-
-[planner]
-host=idea
-output_list=/home/stud2013/ovoroshylov/Clustering/wurst-background/salami.d/00configvec/../pdb_all.list
-output_bin=/home/stud2013/ovoroshylov/Clustering/wurst-background/salami.d/00configvec/../bin
-output_vec2=/home/stud2013/ovoroshylov/Clustering/wurst-background/salami.d/00configvec/../vec2
-class_vec1=/work/public/no_backup/bm/classfile
-port=7003
-cluster=/home/stud2013/ovoroshylov/Clustering/wurst-background/salami.d/00configvec/../clusters90.txt
-temp=/home/stud2013/ovoroshylov/Clustering/wurst-background/salami.d/00configvec/../tmp
-library=/work/public/no_backup/bm/pdb_lib.list
-source=/work/public/no_backup/pdb/data/structures/divided/pdb
-class_vec2=/work/public/no_backup/bm/F7_ca_mod
-output_vec1=/home/stud2013/ovoroshylov/Clustering/wurst-background/salami.d/00configvec/../vec1
-
-[worker]
-port=7003
-timeout_before_jobs=180
-host=idea
-timeout_after_jobs=30
+; Fri Feb 19 18:14:57 2016
 
 [server]
+accept=10
+wakeup=3
+timeout_before_jobs=180
 timeout_after_jobs=30
+port=7003
 delay=0
 gracefully=0
+
+[worker]
 timeout_before_jobs=180
-accept=10
 port=7003
-wakeup=3
+timeout_after_jobs=30
+host=idea
 
 [background]
-updated=1455896813
+updated=1455902097
+
+[planner]
+cluster=/home/stud2013/ovoroshylov/Clustering/wurst-background/salami.d/00configvec/../../var/vector/clusters90.txt
+port=7003
+source=/work/public/no_backup/pdb/data/structures/divided/pdb
+library=/work/public/no_backup/bm/pdb_lib.list
+output_list=/home/stud2013/ovoroshylov/Clustering/wurst-background/salami.d/00configvec/../../var/vector/pdb_all.list
+class_vec2=/work/public/no_backup/bm/F7_ca_mod
+output_vec2=/home/stud2013/ovoroshylov/Clustering/wurst-background/salami.d/00configvec/../../var/vector/vec2
+host=idea
+temp=/home/stud2013/ovoroshylov/Clustering/wurst-background/salami.d/00configvec/../../var/vector/tmp
+class_vec1=/work/public/no_backup/bm/classfile
+output_bin=/home/stud2013/ovoroshylov/Clustering/wurst-background/salami.d/00configvec/../../var/vectorbin
+output_vec1=/home/stud2013/ovoroshylov/Clustering/wurst-background/salami.d/00configvec/../../var/vectorvec1
 
 

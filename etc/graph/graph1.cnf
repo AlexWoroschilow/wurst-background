@@ -1,8 +1,8 @@
 ; Config::Simple 4.59
-; Fri Feb 19 17:28:27 2016
+; Fri Feb 19 18:16:24 2016
 
 [sources]
-graph=/home/stud2013/ovoroshylov/Clustering/wurst-background/var/graph/aacid.ncol
 imbiss=/home/stud2013/ovoroshylov/Clustering/wurst-background/var/imbiss/aacid.csv
+graph=/home/stud2013/ovoroshylov/Clustering/wurst-background/var/graph/aacid.ncol
 
 

@@ -1,21 +1,21 @@
 ; Config::Simple 4.59
-; Fri Feb 19 14:18:17 2016
+; Fri Feb 19 18:15:34 2016
 
 [limits]
-maximal_match=10000
 minimal_seed=2
 minimal_length=15
 maximal_hits=50
+maximal_match=10000
 
 [sources]
-logger=/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/wurstimbiss_aacid_logger.cnf
-alphabet=/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/var/abc/alphabet_t500
-sequencelist=/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/var/seq/seq_all.list
-binarypath=/work/public/no_backup/bm/pdb_all_bin
-pdbpath=/work/public/no_backup/bm/pdb_all_vec_6mer_struct
-structlist=/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/var/seq/seq_all.list
 substitution=/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/vendor/wurst/matrix/blosum62.mat
+logger=/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/wurstimbiss_aacid_logger.cnf
+pdbpath=/work/public/no_backup/bm/pdb_all_vec_6mer_struct
+sequencelist=/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/var/seq/seq_all.list
+structlist=/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/var/seq/seq_all.list
 vectorpath=/work/public/no_backup/bm/
+binarypath=/work/public/no_backup/bm/pdb_all_bin
+alphabet=/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/var/abc/alphabet_t500
 
 [common]
 type=aacid

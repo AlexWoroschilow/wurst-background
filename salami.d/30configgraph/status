@@ -32,7 +32,9 @@ sub main {
 	my $config1 = shift;
 	my $config2 = shift;
 
-	if ( !is_config_correct($config1) || !is_config_correct($config2) ) {
+	if (   !is_config_correct($config1)
+		|| !is_config_correct($config2) )
+	{
 		return "ready";
 	}
 	return "done";
@@ -40,8 +42,8 @@ sub main {
 exit(
 	print(
 		main(
-			"$FindBin::Bin/../../etc/graph/grapha.cnf",
-			"$FindBin::Bin/../../etc/graph/graphs.cnf"
+			"$FindBin::Bin/../../etc/graph/graph1.cnf",
+			"$FindBin::Bin/../../etc/graph/graph2.cnf"
 		)
 	)
 );

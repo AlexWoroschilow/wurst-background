@@ -39,8 +39,8 @@ sub main {
 exit(
 	print(
 		main(
-			"$FindBin::Bin/../../etc/cluster/clustera.cnf",
-			"$FindBin::Bin/../../etc/cluster/clusters.cnf"
+			"$FindBin::Bin/../../etc/cluster/cluster1.cnf",
+			"$FindBin::Bin/../../etc/cluster/cluster2.cnf"
 		)
 	)
 );

@@ -33,9 +33,11 @@ sub main {
 	my $config1 = shift;
 	my $config2 = shift;
 
-	if ( !is_config_correct($config1) || !is_config_correct($config2) ) {
+	if ( !is_config_correct($config1) || !is_config_correct($config2) )
+	{
 		return "ready";
 	}
+
 	return "done";
 }
 

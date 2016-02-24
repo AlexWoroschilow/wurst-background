@@ -1,17 +1,16 @@
 ; Config::Simple 4.59
 ; Fri Feb 19 15:20:41 2016
 
-[sources]
-grapha=/home/stud2013/ovoroshylov/Clustering/wurst-background/var/graph/aacid.ncol
-graphs=/home/stud2013/ovoroshylov/Clustering/wurst-background/var/graph/salami.ncol
-
-clustera=/home/stud2013/ovoroshylov/Clustering/wurst-background/var/cluster/aacid.clust
-clusters=/home/stud2013/ovoroshylov/Clustering/wurst-background/var/cluster/salami.clust
-
-resulta=/home/stud2013/ovoroshylov/Clustering/wurst-background/var/merge/aacid.csv
-results=/home/stud2013/ovoroshylov/Clustering/wurst-background/var/merge/salami.csv
-
-
 [bin]
-startera=/home/stud2013/ovoroshylov/Clustering/wurst-newman/scripts/aacid_vs_salami.pl
-starters=/home/stud2013/ovoroshylov/Clustering/wurst-newman/scripts/salami_vs_aacid.pl
+starter=/home/stud2013/ovoroshylov/Clustering/wurst-cluster/scripts/cluster_compare.pl
+
+[sources]
+graph1=/home/stud2013/ovoroshylov/Clustering/wurst-background/var/graph/aacid.ncol
+graph2=/home/stud2013/ovoroshylov/Clustering/wurst-background/var/graph/salami.ncol
+
+cluster1=/home/stud2013/ovoroshylov/Clustering/wurst-background/var/cluster/aacid.clust
+cluster2=/home/stud2013/ovoroshylov/Clustering/wurst-background/var/cluster/salami.clust
+
+result=/home/stud2013/ovoroshylov/Clustering/wurst-background/var/merge/aacid_vs_salami.csv
+
+

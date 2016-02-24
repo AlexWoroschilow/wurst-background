@@ -13,6 +13,7 @@
 use warnings;
 
 use FindBin;
+
 use lib "$FindBin::Bin/../../lib/perl";
 use Config::Simple;
 
@@ -21,40 +22,51 @@ sub file_exists {
 	return ( ( -d $file ) || ( -e $file ) );
 }
 
+# TODO: check is process runned local
+sub is_background_process {
+	my $file = shift;
+
+	return 0;
+}
+
+sub is_background_process_sge {
+	my $file    = shift;
+	my $cfg     = new Config::Simple($file);
+	my $starter = $cfg->param("bin.starter");
+	my $name    = substr( $starter, rindex( $starter, "/" ) + 1 );
+
+	my $result = `qstat -r -ext`;
+
+	return ( index( $result, $name ) > -1 );
+}
+
+
 sub is_config_correct {
 	my $file = shift;
 
 	my $cfg = new Config::Simple($file);
 
-	if ( !file_exists( $cfg->param("bin.startera") ) ) {
+	if ( !file_exists( $cfg->param("bin.starter") ) ) {
 		return 0;
 	}
 
-	if ( !file_exists( $cfg->param("bin.starters") ) ) {
+	if ( !file_exists( $cfg->param("sources.graph1") ) ) {
 		return 0;
 	}
 
-	if ( !file_exists( $cfg->param("sources.grapha") ) ) {
+	if ( !file_exists( $cfg->param("sources.graph2") ) ) {
 		return 0;
 	}
 
-	if ( !file_exists( $cfg->param("sources.graphs") ) ) {
+	if ( !file_exists( $cfg->param("sources.cluster1") ) ) {
 		return 0;
 	}
 
-	if ( !file_exists( $cfg->param("sources.clustera") ) ) {
+	if ( !file_exists( $cfg->param("sources.cluster2") ) ) {
 		return 0;
 	}
 
-	if ( !file_exists( $cfg->param("sources.clusters") ) ) {
-		return 0;
-	}
-
-	if ( !file_exists( $cfg->param("sources.resulta") ) ) {
-		return 0;
-	}
-
-	if ( !file_exists( $cfg->param("sources.results") ) ) {
+	if ( !file_exists( $cfg->param("sources.result") ) ) {
 		return 0;
 	}
 
@@ -64,12 +76,17 @@ sub is_config_correct {
 sub main {
 	my $config = shift;
 
+	if(is_background_process($config)) {
+		return "wait";
+	}
+
 	if ( !is_config_correct($config) ) {
-		exit( print('ready') );
+		return "ready";
 	}
 
 	return "done";
 }
 
-exit( print( main("$FindBin::Bin/../../etc/merge/merge.cnf") ) );
+my $root = "$FindBin::Bin/../..";
+exit( print( main("$root/etc/merge/merge.cnf") ) );
 

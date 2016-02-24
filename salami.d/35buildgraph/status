@@ -51,8 +51,8 @@ sub main {
 exit(
 	print(
 		main(
-			"$FindBin::Bin/../../etc/graph/grapha.cnf",
-			"$FindBin::Bin/../../etc/graph/graphs.cnf"
+			"$FindBin::Bin/../../etc/graph/graph1.cnf",
+			"$FindBin::Bin/../../etc/graph/graph2.cnf"
 		)
 	)
 );

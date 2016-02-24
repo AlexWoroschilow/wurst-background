@@ -1,8 +1,0 @@
-Count: /home/stud2013/ovoroshylov/Clustering/wurst-background/var/graph/aacid.ncol: 12
-Count: /home/stud2013/ovoroshylov/Clustering/wurst-background/var/graph/salami.ncol: 10
-Count: structures: 10
-Count: /home/stud2013/ovoroshylov/Clustering/wurst-background/var/cluster/aacid.clust: 324
-Count: /home/stud2013/ovoroshylov/Clustering/wurst-background/var/cluster/salami.clust: 603
-Count: sequence graph |V|: 999
-Count: structure graph |V|: 999
-csv;in both clusters;structure a;structure b;tm_score aacid;tm_score salami

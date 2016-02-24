@@ -23,20 +23,18 @@ sub main {
 	my $cfg1 = new Config::Simple($config1);
 	my $cfg2 = new Config::Simple($config2);
 
-	$cfg1->param( "sources.imbiss", "/home/stud2013/ovoroshylov/Clustering/wurst-background/var/imbiss/aacid.csv");
-	$cfg2->param( "sources.imbiss", "/home/stud2013/ovoroshylov/Clustering/wurst-background/var/imbiss/salami.csv");
 
-	$cfg1->write($config1);
-	$cfg2->write($config2);
-
+	# TODO: notify maintainer about wrong config
+	# write xml for salami rss server
+	# and send it over ssh to flensburg
 	return "done";
 }
 
 exit(
 	print(
 		main(
-			"$FindBin::Bin/../../etc/graph/grapha.cnf",
-			"$FindBin::Bin/../../etc/graph/graphs.cnf"
+			"$FindBin::Bin/../../etc/graph/graph1.cnf",
+			"$FindBin::Bin/../../etc/graph/graph2.cnf"
 		)
 	)
 );

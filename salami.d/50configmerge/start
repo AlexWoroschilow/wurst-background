@@ -21,24 +21,16 @@ sub main {
 
 	my $cfg = new Config::Simple($config);
 
-	my $cluster1 = $cfg->param("sources.clustera");
-	my $cluster2 = $cfg->param("sources.clusters");
+	my $cluster1 = $cfg->param("sources.cluster1");
+	my $cluster2 = $cfg->param("sources.cluster2");
 
-	my $graph1 = $cfg->param("sources.grapha");
-	my $graph2 = $cfg->param("sources.graphs");
+	my $graph1 = $cfg->param("sources.graph1");
+	my $graph2 = $cfg->param("sources.graph2");
 
-	my $result1 = $cfg->param("sources.resulta");
-	my $result2 = $cfg->param("sources.results");
+	my $result = $cfg->param("sources.result");
+	my $starter = $cfg->param("bin.starter");
 
-	my $starter1 = $cfg->param("bin.startera");
-	my $starter2 = $cfg->param("bin.starters");
-
-	system(
-		"nohup $starter1 $cluster1 $cluster2 $graph1 $graph2 > $result1 2>&1 &"
-	);
-	system(
-		"nohup $starter2 $cluster1 $cluster2 $graph1 $graph2 > $result2 2>&1 &"
-	);
+	system("nohup $starter $graph1 $graph2 $cluster1 $cluster2 > $result 2>&1 &");
 
 	return "done";
 }

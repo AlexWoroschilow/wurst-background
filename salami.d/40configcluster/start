@@ -20,15 +20,9 @@ sub main {
 	my $cfg1    = new Config::Simple($config1);
 	my $cfg2    = new Config::Simple($config2);
 
-	$cfg1->param( "sources.graph","/home/stud2013/ovoroshylov/Clustering/wurst-background/var/graph/aacid.ncol");
-	$cfg2->param( "sources.graph", "/home/stud2013/ovoroshylov/Clustering/wurst-background/var/graph/salami.ncol");
-
-	$cfg1->param( "sources.cluster", "/home/stud2013/ovoroshylov/Clustering/wurst-background/var/cluster/aacid.clust");
-	$cfg2->param( "sources.cluster", "/home/stud2013/ovoroshylov/Clustering/wurst-background/var/cluster/salami.clust");
-
-	$cfg1->write($config1);
-	$cfg2->write($config2);
-
+	# TODO: notify maintainer about wrong config
+	# write xml for salami rss server
+	# and send it over ssh to flensburg
 	return "done";
 }
 

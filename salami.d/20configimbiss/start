@@ -14,48 +14,43 @@ use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
-use Getopt::Lucid qw( :all );
 use Config::Simple;
 
-my @specs1 = (
-	Param("--config")
-	  ->default("$FindBin::Bin/../../etc/imbiss/wurstimbissa.cnf"),
+sub main {
+	my $config1 = shift;
+	my $config2 = shift;
+
+	my $cfg1 = new Config::Simple($config1);
+
+	$cfg1->param( "sources.structlist", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/var/seq/seq_all.list");
+	$cfg1->param( "sources.sequencelist", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/var/seq/seq_all.list");
+	$cfg1->param( "sources.substitution", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/vendor/wurst/matrix/blosum62.mat");
+	$cfg1->param( "sources.alphabet", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/var/abc/alphabet_t500");
+	$cfg1->param( "sources.logger", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/wurstimbiss_aacid_logger.cnf");
+	$cfg1->param( "sources.binarypath", "/work/public/no_backup/bm/pdb_all_bin" );
+	$cfg1->param( "sources.pdbpath", "/work/public/no_backup/bm/pdb_all_vec_6mer_struct" );
+	$cfg1->param( "sources.vectorpath", "/work/public/no_backup/bm/" );
+	$cfg1->write($config1);
+
+	my $cfg2 = new Config::Simple($config2);
+	$cfg2->param( "sources.structlist", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/var/seq/seq_all.list");
+	$cfg2->param( "sources.sequencelist", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/var/seq/seq_all.list");
+	$cfg2->param( "sources.substitution", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/vendor/wurst/matrix/blosum62.mat");
+	$cfg2->param( "sources.alphabet", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/var/abc/alphabet_t500");
+	$cfg2->param( "sources.logger", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/wurstimbiss_salami_logger.cnf");
+	$cfg2->param( "sources.binarypath", "/work/public/no_backup/bm/pdb_all_bin" );
+	$cfg2->param( "sources.pdbpath", "/work/public/no_backup/bm/pdb_all_vec_6mer_struct" );
+	$cfg2->param( "sources.vectorpath", "/work/public/no_backup/bm/" );
+	$cfg2->write($config2);
+	
+	return "done";
+}
+
+exit(
+	print(
+		main(
+			"$FindBin::Bin/../../etc/imbiss/wurstimbissa.cnf",
+			"$FindBin::Bin/../../etc/imbiss/wurstimbisss.cnf"
+		)
+	)
 );
-
-my @specs2 = (
-	Param("--config")
-	  ->default("$FindBin::Bin/../../etc/imbiss/wurstimbisss.cnf"),
-);
-
-# Parse and validate given parameters
-my $opt1 = Getopt::Lucid->getopt( \@specs1 );
-my $opt2 = Getopt::Lucid->getopt( \@specs2 );
-
-$opt1->validate( { 'requires' => [] } );
-$opt2->validate( { 'requires' => [] } );
-
-my $cfg1 = new Config::Simple( $opt1->get_config );
-my $cfg2 = new Config::Simple( $opt1->get_config );
-
-$cfg1->param("sources.structlist", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/var/seq/seq_all.list");
-$cfg1->param("sources.sequencelist", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/var/seq/seq_all.list");
-$cfg1->param("sources.substitution", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/vendor/wurst/matrix/blosum62.mat");
-$cfg1->param("sources.alphabet", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/var/abc/alphabet_t500");
-$cfg1->param("sources.logger", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/wurstimbiss_aacid_logger.cnf");
-$cfg1->param("sources.binarypath", "/work/public/no_backup/bm/pdb_all_bin");
-$cfg1->param("sources.pdbpath", "/work/public/no_backup/bm/pdb_all_vec_6mer_struct");
-$cfg1->param("sources.vectorpath", "/work/public/no_backup/bm/");
-$cfg1->write( $opt1->get_config );
-
-$cfg2->param("sources.structlist", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/var/seq/seq_all.list");
-$cfg2->param("sources.sequencelist", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/var/seq/seq_all.list");
-$cfg2->param("sources.substitution", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/vendor/wurst/matrix/blosum62.mat");
-$cfg2->param("sources.alphabet", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/var/abc/alphabet_t500");
-$cfg2->param("sources.logger", "/home/stud2013/ovoroshylov/Clustering/wurst-imbiss/wurstimbiss_salami_logger.cnf");
-$cfg2->param("sources.binarypath", "/work/public/no_backup/bm/pdb_all_bin");
-$cfg2->param("sources.pdbpath", "/work/public/no_backup/bm/pdb_all_vec_6mer_struct");
-$cfg2->param("sources.vectorpath", "/work/public/no_backup/bm/");
-$cfg2->write( $opt2->get_config );
-
-
-exit(print('done'))
