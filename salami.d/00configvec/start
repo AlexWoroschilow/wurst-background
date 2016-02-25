@@ -18,35 +18,19 @@ use lib "$FindBin::Bin/../../lib/perl";
 use Getopt::Lucid qw( :all );
 use Config::Simple;
 
-use lib "/home/pool/other/wurst/salamiServer/v02";
-use Salamisrvini;
-use lib $LIB_LIB;     #initialize in local Salamisrvini.pm;
-use lib $LIB_ARCH;    #initialize in local Salamisrvini.pm;
-use vars qw ( $INPUT_CLST_LIST $OUTPUT_BIN_DIR $PDB_TOP_DIR $OUTPUT_LIB_LIST);
-
-#
-#
-#
 sub main {
-	my $config = shift;
+	my $config1 = shift;
+	my $config2 = shift;
 
-	my $cfg = new Config::Simple($config);
-
-	$cfg->param( "background.updated",  time() );
-	$cfg->param( "planner.library",     $OUTPUT_LIB_LIST );
-	$cfg->param( "planner.cluster",     "$FindBin::Bin/../../var/vector/clusters90.txt" );
-	$cfg->param( "planner.source",      $PDB_TOP_DIR );
-	$cfg->param( "planner.temp",        "$FindBin::Bin/../../var/vector/tmp" );
-	$cfg->param( "planner.output_bin",  "$FindBin::Bin/../../var/vectorbin" );
-	$cfg->param( "planner.output_vec1", "$FindBin::Bin/../../var/vectorvec1" );
-	$cfg->param( "planner.output_vec2", "$FindBin::Bin/../../var/vector/vec2" );
-	$cfg->param( "planner.class_vec1",  $CLASSFILE );
-	$cfg->param( "planner.class_vec2",  $CA_CLASSFILE );
-	$cfg->param( "planner.output_list", "$FindBin::Bin/../../var/vector/pdb_all.list" );
-	$cfg->write($config);
-
+	# TODO: notify maintainer about wrong config
+	# write xml for salami rss server
+	# and send it over ssh to flensburg
 	return "done";
 }
-
-exit( print( main("$FindBin::Bin/../../etc/vector/buildvec.cnf") ) );
-
+exit(
+	print(
+		main(
+			"$FindBin::Bin/../../etc/vector/vector.cnf",
+		)
+	)
+);

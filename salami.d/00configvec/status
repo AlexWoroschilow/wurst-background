@@ -10,16 +10,39 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-use strict;
 use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
+use Getopt::Lucid qw( :all );
 use Config::Simple;
 
-sub main {
-	return "ready";
+sub file_exists {
+	my $file = shift;
+	return ( ( -d $file ) || ( -e $file ) );
 }
 
-exit( print( main("$FindBin::Bin/../../etc/vector/buildvec.cnf") ) );
+sub is_config_correct {
+	my $file = shift;
+	my $cfg  = new Config::Simple($file);
 
+	if ( !file_exists( $cfg->param("bin.checker") ) ) {
+		return 0;
+	}
+
+	if ( !file_exists( $cfg->param("bin.starter") ) ) {
+		return 0;
+	}
+
+	return 1;
+}
+
+sub main {
+	my $config = shift;
+
+	if ( !is_config_correct($config) ) {
+		return "ready";
+	}
+	return "done";
+}
+exit( print( main( "$FindBin::Bin/../../etc/vector/vectors.cnf", ) ) );

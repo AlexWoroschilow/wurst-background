@@ -1,0 +1,7 @@
+; Config::Simple 4.59
+; Fri Feb 19 18:15:34 2016
+
+[bin]
+checker=/home/stud2013/ovoroshylov/Clustering/wurst-background/projects/wurst-imbiss/structconfig.sh
+starter=/home/stud2013/ovoroshylov/Clustering/wurst-background/projects/wurst-imbiss/structimbiss.sh
+

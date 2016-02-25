@@ -19,7 +19,6 @@ use Config::Simple;
 sub main {
 	my $config1 = shift;
 	my $config2 = shift;
-
 	my $cfg1 = new Config::Simple($config1);
 	my $cfg2 = new Config::Simple($config2);
 

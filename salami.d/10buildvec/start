@@ -10,5 +10,30 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-print('10buildvec')
+use FindBin;
+use lib "$FindBin::Bin/../../lib/perl";
+use Config::Simple;
+
+sub main {
+	my $config1 = shift;
+
+	my $cfg = new Config::Simple($config1);
+
+	my $starter = $cfg->param("bin.starter");
+
+
+#	system("nohup $starter1 $graph1 $cluster1 >/dev/null 2>&1 &");
+#	system("nohup $starter2 $graph2 $cluster2 >/dev/null 2>&1 &");
+
+	return "underconstruction";
+}
+
+exit(
+	print(
+		main(
+			"$FindBin::Bin/../../etc/cluster/cluster1.cnf",
+			"$FindBin::Bin/../../etc/cluster/cluster2.cnf"
+		)
+	)
+);
 

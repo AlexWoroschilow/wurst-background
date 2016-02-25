@@ -17,56 +17,33 @@ use lib "$FindBin::Bin/../../lib/perl";
 use Getopt::Lucid qw( :all );
 use Config::Simple;
 
+sub file_exists {
+	my $file = shift;
+	return ( ( -d $file ) || ( -e $file ) );
+}
+
 sub is_config_correct {
 	my $file = shift;
 
 	my $cfg = new Config::Simple($file);
 
-	my $structlist = $cfg->param("sources.structlist");
-	if ( !( ( -d $structlist ) || ( -e $structlist ) ) ) {
+	if ( !file_exists( $cfg->param("bin.checker") ) ) {
 		return 0;
 	}
 
-	my $sequencelist = $cfg->param("sources.sequencelist");
-	if ( !( ( -d $sequencelist ) || ( -e $sequencelist ) ) ) {
+	if ( !file_exists( $cfg->param("bin.starter") ) ) {
 		return 0;
 	}
-	my $substitution = $cfg->param("sources.substitution");
-	if ( !( ( -d $substitution ) || ( -e $substitution ) ) ) {
-		return 0;
-	}
-
-	my $alphabet1 = $cfg->param("sources.alphabet");
-	if ( !( ( -d $alphabet1 ) || ( -e $alphabet1 ) ) ) {
-		return 0;
-	}
-	my $logger1 = $cfg->param("sources.logger");
-	if ( !( ( -d $logger1 ) || ( -e $logger1 ) ) ) {
-		return 0;
-	}
-
-	my $binarypath1 = $cfg->param("sources.binarypath");
-	if ( !( ( -d $binarypath1 ) || ( -e $binarypath1 ) ) ) {
-		return 0;
-	}
-
-	my $pdbpath1 = $cfg->param("sources.pdbpath");
-	if ( !( ( -d $pdbpath1 ) || ( -e $pdbpath1 ) ) ) {
-		return 0;
-	}
-
-	my $vectorpath1 = $cfg->param("sources.vectorpath");
-	if ( !( ( -d $vectorpath1 ) || ( -e $vectorpath1 ) ) ) {
-		return 0;
-	}
-
 	return 1;
 }
+
 sub main {
 	my $config1 = shift;
 	my $config2 = shift;
 
-	if ( !is_config_correct($config1) || !is_config_correct($config2) ) {
+	if (   !is_config_correct($config1)
+		|| !is_config_correct($config2) )
+	{
 		return "ready";
 	}
 
@@ -76,8 +53,8 @@ sub main {
 exit(
 	print(
 		main(
-			"$FindBin::Bin/../../etc/imbiss/wurstimbissa.cnf",
-			"$FindBin::Bin/../../etc/imbiss/wurstimbisss.cnf"
+			"$FindBin::Bin/../../etc/imbiss/imbiss1.cnf",
+			"$FindBin::Bin/../../etc/imbiss/imbiss2.cnf"
 		)
 	)
 );

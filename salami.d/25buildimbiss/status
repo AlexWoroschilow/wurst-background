@@ -10,5 +10,55 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-print('done')
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../../lib/perl";
+use Getopt::Lucid qw( :all );
+use Config::Simple;
+
+sub check_background_process {
+	my $file = shift;
+
+	return 0;
+}
+
+sub is_background_process_sge {
+	my $file    = shift;
+	my $cfg     = new Config::Simple($file);
+	my $starter = $cfg->param("bin.starter");
+	my $name    = substr( $starter, rindex( $starter, "/" ) + 1 );
+
+	my $result = `qstat -r -ext`;
+
+	return ( index( $result, $name ) > -1 );
+}
+
+sub main {
+	my $config1 = shift;
+	my $config2 = shift;
+
+	if (   check_background_process($config1)
+		|| is_background_process_sge($config1) )
+	{
+		return "wait";
+	}
+
+	if (   check_background_process($config2)
+		|| is_background_process_sge($config2) )
+	{
+		return "wait";
+	}
+
+	return "done";
+}
+
+exit(
+	print(
+		main(
+			"$FindBin::Bin/../../etc/imbiss/imbiss1.cnf",
+			"$FindBin::Bin/../../etc/imbiss/imbiss2.cnf"
+		)
+	)
+);
 
