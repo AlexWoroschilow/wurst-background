@@ -22,16 +22,26 @@ sub main {
 	my $file = shift;
 
 	my $config = new Config::Simple($file);
-	
-	return ("ready")
-	  if ( !ZBH::SGE::is_file_exists( $config->param("sequence.graph") )
-		|| !ZBH::SGE::is_file_exists( $config->param("sequence.cluster") )
-		|| !ZBH::SGE::is_file_exists( $config->param("structure.graph") )
-		|| !ZBH::SGE::is_file_exists( $config->param("structure.cluster") ) 
-		|| !ZBH::SGE::is_file_exists( $config->param("bin.status") )
-		|| !ZBH::SGE::is_file_exists( $config->param("bin.starter") ) );
 
-	return ("done");
+	my $status  = $config->param("bin.status");
+	my $starter = $config->param("bin.starter");
+
+	my $result = `$status`;
+	return ("wait") if ( $result eq "started" );
+
+	if ( ZBH::SGE::is_file_exists( $config->param("result.merge") ) ) {
+
+		my $todayrun = time;
+		my $lastrun  = $config->param("settings.lastrun");
+		my $interval = $config->param("settings.interval");
+		if ( ( $todayrun - $lastrun ) > $interval ) {
+			return ("ready");
+		}
+
+		return ("done");
+	}
+
+	return ("ready");
 }
 
 exit( print( main( "$FindBin::Bin/../../etc/merge.cnf", ) ) );

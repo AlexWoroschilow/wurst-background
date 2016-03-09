@@ -17,22 +17,14 @@ use lib "$FindBin::Bin/../../lib/perl";
 use Config::Simple;
 
 sub main {
-	my $config = shift;
+	my $file = shift;
 
-	my $cfg = new Config::Simple($config);
+	my $config = new Config::Simple($file);
 
-	my $cluster1 = $cfg->param("sources.cluster1");
-	my $cluster2 = $cfg->param("sources.cluster2");
-
-	my $graph1 = $cfg->param("sources.graph1");
-	my $graph2 = $cfg->param("sources.graph2");
-
-	my $result = $cfg->param("sources.result");
-	my $starter = $cfg->param("bin.starter");
-
-	system("nohup $starter $graph1 $graph2 $cluster1 $cluster2 > $result 2>&1 &");
-
-	return "done";
+	# TODO: notify maintainer about wrong config
+	# write xml for salami rss server
+	# and send it over ssh to flensburg
+	return ("wait");
 }
 
-exit( print( main("$FindBin::Bin/../../etc/merge/merge.cnf") ) );
+exit( print( main( "$FindBin::Bin/../../etc/merge.cnf", ) ) );
