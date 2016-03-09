@@ -29,7 +29,7 @@ sub main {
 	return ("wait") if ( $result eq "started" );
 
 	if (   ZBH::SGE::is_file_exists( $config->param("sequence.cluster") )
-		|| ZBH::SGE::is_file_exists( $config->param("structure.cluster") ) ) {
+		&& ZBH::SGE::is_file_exists( $config->param("structure.cluster") ) ) {
 			
 		my $todayrun = time;
 		my $lastrun  = $config->param("settings.lastrun");
