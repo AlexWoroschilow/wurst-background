@@ -15,44 +15,21 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use Config::Simple;
-
-sub file_exists {
-	my $file = shift;
-	return ( ( -d $file ) || ( -e $file ) );
-}
-
-sub is_input_exists {
-	my $file = shift;
-
-	my $cfg = new Config::Simple($file);
-
-	return file_exists( $cfg->param("sources.imbiss") );
-}
-
-sub is_output_exists {
-	my $file = shift;
-	my $cfg  = new Config::Simple($file);
-	return file_exists( $cfg->param("sources.graph") );
-}
+use ZBH::SGE;
 
 sub main {
-	my $config1 = shift;
-	my $config2 = shift;
+	my $file   = shift;
+	my $config = new Config::Simple($file);
 
-	if ( is_output_exists($config1) && is_output_exists($config2) ) {
-		return "done";
-	}
+	return ("done")
+	  if ( ZBH::SGE::is_file_exists( $config->param("sequence.graph") )
+		&& ZBH::SGE::is_file_exists( $config->param("structure.graph") ) );
 
-	if ( is_input_exists($config1) && is_input_exists($config2) ) {
-		return "ready";
-	}
+	return ("ready")
+	  if ( ZBH::SGE::is_file_exists( $config->param("sequence.imbiss") )
+		&& ZBH::SGE::is_file_exists( $config->param("structure.imbiss") ) );
+
+	return ("wait");
 }
 
-exit(
-	print(
-		main(
-			"$FindBin::Bin/../../etc/graph/graph1.cnf",
-			"$FindBin::Bin/../../etc/graph/graph2.cnf"
-		)
-	)
-);
+exit( print( main( "$FindBin::Bin/../../etc/graph.cnf", ) ) );

@@ -18,17 +18,15 @@ use Getopt::Lucid qw( :all );
 use Config::Simple;
 
 sub main {
-	my $config1 = shift;
-	my $config2 = shift;
+	my $file = shift;
 
-	my $cfg1 = new Config::Simple($config1);
-	my $cfg2 = new Config::Simple($config2);
+	my $config = new Config::Simple($file);
 
-	my $imbiss1 = $cfg1->param("sources.imbiss");
-	my $imbiss2 = $cfg2->param("sources.imbiss");
+	my $graph1 = $config->param("sequence.graph");
+	my $imbiss1 = $config->param("sequence.imbiss");
 
-	my $graph1 = $cfg1->param("sources.graph");
-	my $graph2 = $cfg2->param("sources.graph");
+	my $graph2 = $config->param("structure.graph");
+	my $imbiss2 = $config->param("structure.imbiss");
 
 	my $first;
 
@@ -70,17 +68,9 @@ sub main {
 	close(GRAPH);
 	close(INPUT);
 	
-	return "done";
+	return("done");
 }
 
-my $root = "$FindBin::Bin/../..";
+exit( print( main( "$FindBin::Bin/../../etc/graph.cnf", ) ) );
 
-exit(
-	print(
-		main(
-			"$root/etc/graph/graph1.cnf",
-			"$root/etc/graph/graph2.cnf"
-		)
-	)
-);
 

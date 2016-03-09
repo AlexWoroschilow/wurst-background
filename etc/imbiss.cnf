@@ -1,0 +1,12 @@
+; Config::Simple 4.59
+; Wed Mar  9 15:36:08 2016
+
+[settings]
+interval=999999999
+lastrun=1457534168
+
+[bin]
+starter=/home/other/wurst/wurst-background/projects/wurst-imbiss/starter
+status=/home/other/wurst/wurst-background/projects/wurst-imbiss/status
+
+

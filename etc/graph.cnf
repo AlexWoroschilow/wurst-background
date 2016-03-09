@@ -1,0 +1,11 @@
+; Config::Simple 4.59
+; Fri Feb 19 18:16:24 2016
+
+[sequence]
+imbiss=/home/other/wurst/wurst-background/var/sequence.csv
+graph=/home/other/wurst/wurst-background/var/sequence.ncol
+
+[structure]
+imbiss=/home/other/wurst/wurst-background/var/structure.csv
+graph=/home/other/wurst/wurst-background/var/structure.ncol
+

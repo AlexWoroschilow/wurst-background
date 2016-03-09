@@ -15,23 +15,14 @@ use lib "$FindBin::Bin/../../lib/perl";
 use Config::Simple;
 
 sub main {
-	my $config1 = shift;
-	my $config2 = shift;
-	my $cfg1    = new Config::Simple($config1);
-	my $cfg2    = new Config::Simple($config2);
+	my $file = shift;
+
+	my $config = new Config::Simple($file);
 
 	# TODO: notify maintainer about wrong config
 	# write xml for salami rss server
 	# and send it over ssh to flensburg
-	return "done";
+	return ("done");
 }
 
-exit(
-	print(
-		main(
-			"$FindBin::Bin/../../etc/cluster/clustera.cnf",
-			"$FindBin::Bin/../../etc/cluster/clusters.cnf"
-		)
-	)
-);
-
+exit( print( main( "$FindBin::Bin/../../etc/cluster.cnf", ) ) );

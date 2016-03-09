@@ -19,18 +19,13 @@ use Getopt::Lucid qw( :all );
 use Config::Simple;
 
 sub main {
-	my $config1 = shift;
-	my $config2 = shift;
+	my $file   = shift;
+	my $config = new Config::Simple($file);
 
 	# TODO: notify maintainer about wrong config
 	# write xml for salami rss server
 	# and send it over ssh to flensburg
-	return "done";
+	return ("done");
 }
-exit(
-	print(
-		main(
-			"$FindBin::Bin/../../etc/vector/vector.cnf",
-		)
-	)
-);
+
+exit( print( main("$FindBin::Bin/../../etc/vector.cnf") ) );

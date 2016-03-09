@@ -16,34 +16,19 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use Getopt::Lucid qw( :all );
 use Config::Simple;
-
-sub file_exists {
-	my $file = shift;
-	return ( ( -d $file ) || ( -e $file ) );
-}
-
-sub is_config_correct {
-	my $file = shift;
-	my $cfg  = new Config::Simple($file);
-	return file_exists( $cfg->param("sources.imbiss") );
-}
+use ZBH::SGE;
 
 sub main {
-	my $config1 = shift;
-	my $config2 = shift;
+	my $file = shift;
 
-	if (   !is_config_correct($config1)
-		|| !is_config_correct($config2) )
-	{
-		return "ready";
-	}
-	return "done";
+	my $config = new Config::Simple($file);
+
+	return ("ready")
+	  if ( not ZBH::SGE::is_file_exists( $config->param("sequence.imbiss") ) );
+
+	return ("ready")
+	  if ( not ZBH::SGE::is_file_exists( $config->param("structure.imbiss") ) );
+
+	return ("done");
 }
-exit(
-	print(
-		main(
-			"$FindBin::Bin/../../etc/graph/graph1.cnf",
-			"$FindBin::Bin/../../etc/graph/graph2.cnf"
-		)
-	)
-);
+exit( print( main( "$FindBin::Bin/../../etc/graph.cnf", ) ) );

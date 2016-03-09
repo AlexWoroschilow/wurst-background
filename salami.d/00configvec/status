@@ -16,33 +16,16 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use Getopt::Lucid qw( :all );
 use Config::Simple;
-
-sub file_exists {
-	my $file = shift;
-	return ( ( -d $file ) || ( -e $file ) );
-}
-
-sub is_config_correct {
-	my $file = shift;
-	my $cfg  = new Config::Simple($file);
-
-	if ( !file_exists( $cfg->param("bin.checker") ) ) {
-		return 0;
-	}
-
-	if ( !file_exists( $cfg->param("bin.starter") ) ) {
-		return 0;
-	}
-
-	return 1;
-}
+use ZBH::SGE;
 
 sub main {
-	my $config = shift;
+	my $file   = shift;
+	my $config = new Config::Simple($file);
 
-	if ( !is_config_correct($config) ) {
-		return "ready";
-	}
-	return "done";
+	return ("ready")
+	  if ( !ZBH::SGE::is_file_exists( $config->param("bin.status") )
+		|| !ZBH::SGE::is_file_exists( $config->param("bin.starter") ) );
+
+	return ("done");
 }
-exit( print( main( "$FindBin::Bin/../../etc/vector/vectors.cnf", ) ) );
+exit( print( main("$FindBin::Bin/../../etc/vector.cnf") ) );

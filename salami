@@ -11,7 +11,9 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os, re, glob
+import subprocess
 from optparse import OptionParser
+from time import sleep
 
 class Task(object):
     def __init__(self, path):
@@ -101,13 +103,16 @@ class Queue(object):
 class TaskRunner(object):
     def __init__(self, task):
         self._task = task
-        self._status = os.popen(task.status).read();
-        print(self._status)
         pass
     
     def start(self):
-        print(os.popen(self._task.start).read())
-        pass
+        with subprocess.Popen([self._task.status], stdout=subprocess.PIPE) as process:
+            stdoutdata, stderrdata = process.communicate()
+            print(stdoutdata.decode('utf-8'), stderrdata)
+            if stdoutdata.decode('utf-8') == 'ready':
+                with subprocess.Popen([self._task.start], stdout=subprocess.PIPE) as process:
+                    stdoutdata, stderrdata = process.communicate()
+                    print(stdoutdata.decode('utf-8'), stderrdata)
 
     @property
     def status(self):

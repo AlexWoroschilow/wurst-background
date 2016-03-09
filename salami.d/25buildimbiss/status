@@ -16,49 +16,30 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use Getopt::Lucid qw( :all );
 use Config::Simple;
-
-sub check_background_process {
-	my $file = shift;
-
-	return 0;
-}
-
-sub is_background_process_sge {
-	my $file    = shift;
-	my $cfg     = new Config::Simple($file);
-	my $starter = $cfg->param("bin.starter");
-	my $name    = substr( $starter, rindex( $starter, "/" ) + 1 );
-
-	my $result = `qstat -r -ext`;
-
-	return ( index( $result, $name ) > -1 );
-}
+use ZBH::SGE;
 
 sub main {
-	my $config1 = shift;
-	my $config2 = shift;
+	my $file = shift;
 
-	if (   check_background_process($config1)
-		|| is_background_process_sge($config1) )
-	{
-		return "wait";
+	my $config  = new Config::Simple($file);
+	my $starter = $config->param("bin.starter");
+	my $status  = $config->param("bin.status");
+
+	my $result = `$status`;
+	return ("wait") if ( $result eq "started" );
+
+	if ( $result eq "done" ) {
+		my $todayrun = time;
+		my $lastrun  = $config->param("settings.lastrun");
+		my $interval = $config->param("settings.interval");
+		if ( ( $todayrun - $lastrun ) > $interval ) {
+			return ("ready");
+		}
+
+		return ("done");
 	}
-
-	if (   check_background_process($config2)
-		|| is_background_process_sge($config2) )
-	{
-		return "wait";
-	}
-
-	return "done";
+	return ("ready");
 }
 
-exit(
-	print(
-		main(
-			"$FindBin::Bin/../../etc/imbiss/imbiss1.cnf",
-			"$FindBin::Bin/../../etc/imbiss/imbiss2.cnf"
-		)
-	)
-);
+exit( print( main( "$FindBin::Bin/../../etc/imbiss.cnf", ) ) );
 

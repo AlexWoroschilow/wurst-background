@@ -9,79 +9,39 @@
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.use strict;
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
+use Getopt::Lucid qw( :all );
 use Config::Simple;
-
-sub file_exists {
-	my $file = shift;
-	return ( ( -d $file ) || ( -e $file ) );
-}
-
-sub check_background_process {
-	my $file = shift;
-
-	return 0;
-}
-
-sub is_background_process_sge {
-	my $file    = shift;
-	my $cfg     = new Config::Simple($file);
-	my $starter = $cfg->param("bin.starter");
-	my $name    = substr( $starter, rindex( $starter, "/" ) + 1 );
-
-	my $result = `qstat -r -ext`;
-
-	return ( index( $result, $name ) > -1 );
-}
-
-sub is_config_correct {
-	my $file = shift;
-
-	my $cfg = new Config::Simple($file);
-
-	if ( !file_exists( $cfg->param("sources.cluster") ) ) {
-		return 0;
-	}
-
-	return 1;
-}
+use ZBH::SGE;
 
 sub main {
-	my $config1 = shift;
-	my $config2 = shift;
+	my $file = shift;
 
-	if (   is_background_process_sge($config1)
-		&& is_background_process_sge($config2) )
-	{
-		return "wait";
+	my $config  = new Config::Simple($file);
+	my $starter = $config->param("bin.starter");
+	my $status  = $config->param("bin.status");
+
+	my $result = `$status`;
+	return ("wait") if ( $result eq "started" );
+
+	if (   ZBH::SGE::is_file_exists( $config->param("sequence.cluster") )
+		|| ZBH::SGE::is_file_exists( $config->param("structure.cluster") ) ) {
+			
+		my $todayrun = time;
+		my $lastrun  = $config->param("settings.lastrun");
+		my $interval = $config->param("settings.interval");
+		if ( ( $todayrun - $lastrun ) > $interval ) {
+			return ("ready");
+		}
+
+		return ("done");
 	}
 
-	if (   check_background_process($config1)
-		&& check_background_process($config2) )
-	{
-		return "wait";
-	}
-
-	if (   !is_config_correct($config1)
-		|| !is_config_correct($config2) )
-	{
-		return "ready";
-	}
-
-	return "done";
-
+	return ("ready");
 }
 
-exit(
-	print(
-		main(
-			"$FindBin::Bin/../../etc/cluster/cluster1.cnf",
-			"$FindBin::Bin/../../etc/cluster/cluster2.cnf"
-		)
-	)
-);
-
+exit( print( main( "$FindBin::Bin/../../etc/cluster.cnf", ) ) );
