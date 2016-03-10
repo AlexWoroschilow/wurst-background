@@ -22,10 +22,10 @@ sub main {
 	my $file   = shift;
 	my $config = new Config::Simple($file);
 
-	return ("ready")
-	  if ( !ZBH::SGE::is_file_exists( $config->param("bin.status") )
-		|| !ZBH::SGE::is_file_exists( $config->param("bin.starter") ) );
+	return ("done")
+	  if ( ZBH::SGE::is_file_exists( $config->param("bin.status") )
+		|| ZBH::SGE::is_file_exists( $config->param("bin.starter") ) );
 
-	return ("done");
+	return ("ready");
 }
 exit( print( main("$FindBin::Bin/../../etc/vector.cnf") ) );

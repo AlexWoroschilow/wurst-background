@@ -10,5 +10,24 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-print('70clean')
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../../lib/perl";
+use Getopt::Lucid qw( :all );
+use Config::Simple;
+use ZBH::SGE;
+
+sub main {
+	my $file = shift;
+
+	my $config = new Config::Simple($file);
+	my $status = $config->param("bin.status");
+	my $result = `$status`;
+
+	return ("ready") if ( $result eq "done" );
+	return ("wait");
+}
+
+exit( print( main( "$FindBin::Bin/../../etc/imbiss.cnf", ) ) );
 

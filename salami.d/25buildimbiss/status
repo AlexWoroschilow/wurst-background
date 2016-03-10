@@ -22,13 +22,14 @@ sub main {
 	my $file = shift;
 
 	my $config  = new Config::Simple($file);
-	my $starter = $config->param("bin.starter");
 	my $status  = $config->param("bin.status");
 
 	my $result = `$status`;
+	
 	return ("wait") if ( $result eq "started" );
 
 	if ( $result eq "done" ) {
+		
 		my $todayrun = time;
 		my $lastrun  = $config->param("settings.lastrun");
 		my $interval = $config->param("settings.interval");

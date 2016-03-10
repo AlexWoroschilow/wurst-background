@@ -22,7 +22,7 @@ sub main {
 	# TODO: notify maintainer about wrong config
 	# write xml for salami rss server
 	# and send it over ssh to flensburg
-	return ("done");
+	return ("wait");
 }
 
 exit( print( main( "$FindBin::Bin/../../etc/cluster.cnf", ) ) );

@@ -23,15 +23,13 @@ sub main {
 
 	my $config = new Config::Simple($file);
 	
-	return ("ready")
-	  if ( !ZBH::SGE::is_file_exists( $config->param("sequence.graph") )
-		|| !ZBH::SGE::is_file_exists( $config->param("sequence.cluster") )
-		|| !ZBH::SGE::is_file_exists( $config->param("structure.graph") )
-		|| !ZBH::SGE::is_file_exists( $config->param("structure.cluster") ) 
-		|| !ZBH::SGE::is_file_exists( $config->param("bin.status") )
-		|| !ZBH::SGE::is_file_exists( $config->param("bin.starter") ) );
+	return ("done")
+	  if ( ZBH::SGE::is_file_exists( $config->param("sequence.graph") )
+		&& ZBH::SGE::is_file_exists( $config->param("sequence.cluster") )
+		&& ZBH::SGE::is_file_exists( $config->param("structure.graph") )
+		&& ZBH::SGE::is_file_exists( $config->param("structure.cluster") ) );
 
-	return ("done");
+	return ("ready");
 }
 
 exit( print( main( "$FindBin::Bin/../../etc/merge.cnf", ) ) );

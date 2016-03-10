@@ -15,16 +15,87 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use Config::Simple;
+use strict;
+use warnings;
+use File::Basename;
+use ZBH::SGE;
+use ZBH::Merge;
 
-sub main {
+sub main ($) {
 	my $file = shift;
 
 	my $config = new Config::Simple($file);
+	$config->param( "settings.lastrun", time );
+	$config->write($file);
 
-	# TODO: notify maintainer about wrong config
-	# write xml for salami rss server
-	# and send it over ssh to flensburg
-	return ("wait");
+	my $output 			  = $config->param("result.output");
+	my $sequence_graph    = $config->param("sequence.graph");
+	my $sequence_cluster  = $config->param("sequence.cluster");
+	my $structure_graph   = $config->param("structure.graph");
+	my $structure_cluster = $config->param("structure.cluster");
+
+	return ("failure")
+	  if ( !ZBH::SGE::is_file_exists($sequence_graph)
+		|| !ZBH::SGE::is_file_exists($sequence_cluster)
+		|| !ZBH::SGE::is_file_exists($structure_graph)
+		|| !ZBH::SGE::is_file_exists($structure_cluster) );
+
+	my @structures       = ZBH::Merge::create_structure_list($sequence_graph);
+	my $structures_count = scalar(@structures);
+	#(print("Count: structures: $structures_count\n"));
+
+	my %hashtable_cluster_aacid = ZBH::Merge::create_hashtable_cluster($sequence_cluster);
+	my $hashtable_cluster_aacid_count = scalar( keys %hashtable_cluster_aacid );
+	#(print("Count: $cluster_aacid: $hashtable_cluster_aacid_count\n"));
+
+	my %hashtable_cluster_salami = ZBH::Merge::create_hashtable_cluster($structure_cluster);
+	my $hashtable_cluster_salami_count = scalar( keys %hashtable_cluster_salami );
+	#(print("Count: $cluster_salami: $hashtable_cluster_salami_count\n"));
+
+	my %hashtable_graph_aacid = ZBH::Merge::create_hashtable_graph($sequence_graph);
+	my $hashtable_graph_aacid_count = scalar( keys %hashtable_graph_aacid );
+	#(print("Count: sequence graph |V|: $hashtable_graph_aacid_count\n"));
+
+	my %hashtable_graph_salami = ZBH::Merge::create_hashtable_graph($structure_graph);
+	my $hashtable_graph_salami_count = scalar( keys %hashtable_graph_salami );
+	#(print("Count: structure graph |V|: $hashtable_graph_salami_count\n"));
+
+	open( MERGE, '>', "$output" );
+	print(MERGE "structure_a;structure_b;sequence_identity;tm_score\n");
+
+	for my $structure1 (@structures) {
+
+		next if ( not $hashtable_cluster_aacid{$structure1}
+			or not $hashtable_cluster_salami{$structure1} );
+
+		for my $structure2 (@structures) {
+
+			next if ( not $hashtable_cluster_aacid{$structure2}
+				or not $hashtable_cluster_salami{$structure2} );
+
+			my $structure1_cluster_aacid = $hashtable_cluster_aacid{$structure1};
+			my $structure2_cluster_aacid = $hashtable_cluster_aacid{$structure2};
+
+			next if ( $structure1_cluster_aacid != $structure2_cluster_aacid );
+
+			my $structure1_cluster_salami = $hashtable_cluster_salami{$structure1};
+			my $structure2_cluster_salami = $hashtable_cluster_salami{$structure2};
+
+			next if ( $structure1_cluster_salami != $structure2_cluster_salami );
+
+			my $hash1 = "$structure1$structure2";
+			next if ( not $hashtable_graph_aacid{$hash1}
+				or not $hashtable_graph_salami{$hash1} );
+
+			my $tm_score    = $hashtable_graph_salami{$hash1};
+			my $sequence_id = $hashtable_graph_aacid{$hash1};
+
+			print(MERGE "$structure1;$structure2;$sequence_id;$tm_score\n");
+		}
+	}
+	close(MERGE);
+	
+	return ("done");
 }
 
 exit( print( main("$FindBin::Bin/../../etc/merge.cnf") ) );

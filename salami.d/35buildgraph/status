@@ -21,6 +21,7 @@ sub main {
 	my $file   = shift;
 	my $config = new Config::Simple($file);
 
+	#TODO: check process on local host
 	return ("done")
 	  if ( ZBH::SGE::is_file_exists( $config->param("sequence.graph") )
 		&& ZBH::SGE::is_file_exists( $config->param("structure.graph") ) );

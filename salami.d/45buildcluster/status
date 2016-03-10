@@ -26,22 +26,24 @@ sub main {
 	my $status  = $config->param("bin.status");
 
 	my $result = `$status`;
-	return ("wait") if ( $result eq "started" );
 
-	if (   ZBH::SGE::is_file_exists( $config->param("sequence.cluster") )
-		&& ZBH::SGE::is_file_exists( $config->param("structure.cluster") ) ) {
-			
-		my $todayrun = time;
-		my $lastrun  = $config->param("settings.lastrun");
-		my $interval = $config->param("settings.interval");
-		if ( ( $todayrun - $lastrun ) > $interval ) {
-			return ("ready");
-		}
+	return ("wait")
+	  if ( $result eq "started"
+		|| !ZBH::SGE::is_file_exists( $config->param("sequence.graph") )
+		|| !ZBH::SGE::is_file_exists( $config->param("structure.graph") ) );
 
-		return ("done");
+	return ("ready")
+	  if ( !ZBH::SGE::is_file_exists( $config->param("sequence.cluster") )
+		|| !ZBH::SGE::is_file_exists( $config->param("structure.cluster") ) );
+
+	my $todayrun = time;
+	my $lastrun  = $config->param("settings.lastrun");
+	my $interval = $config->param("settings.interval");
+	if ( ( $todayrun - $lastrun ) > $interval ) {
+		return ("ready");
 	}
 
-	return ("ready");
+	return ("done");
 }
 
 exit( print( main( "$FindBin::Bin/../../etc/cluster.cnf", ) ) );

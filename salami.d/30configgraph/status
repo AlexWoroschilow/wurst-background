@@ -23,12 +23,10 @@ sub main {
 
 	my $config = new Config::Simple($file);
 
-	return ("ready")
-	  if ( not ZBH::SGE::is_file_exists( $config->param("sequence.imbiss") ) );
-
-	return ("ready")
-	  if ( not ZBH::SGE::is_file_exists( $config->param("structure.imbiss") ) );
-
-	return ("done");
+	return ("done")
+	  if ( ZBH::SGE::is_file_exists( $config->param("sequence.imbiss") )
+		&& ZBH::SGE::is_file_exists( $config->param("structure.imbiss") ) );
+		
+	return ("ready");
 }
 exit( print( main( "$FindBin::Bin/../../etc/graph.cnf", ) ) );

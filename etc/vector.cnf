@@ -3,10 +3,9 @@
 
 [settings]
 lastrun=1457453533
-interval=999999999
+# Rebuild vectores every week(in seconds)
+interval=604800
 
 [bin]
 starter=/home/other/wurst/wurst-background/projects/wurst-vector/starter
 status=/home/other/wurst/wurst-background/projects/wurst-vector/status
-
-
