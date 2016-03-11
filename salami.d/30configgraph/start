@@ -15,14 +15,30 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use Config::Simple;
+use ZBH::Flensburg;
+use ZBH::SGE;
 
 sub main {
-	my $file   = shift;
+	my $file = shift;
+
 	my $config = new Config::Simple($file);
 
-	# TODO: notify maintainer about wrong config
-	# write xml for salami rss server
-	# and send it over ssh to flensburg
+	my $sequence_imbiss  = $config->param("sequence.imbiss");
+	my $structure_imbiss = $config->param("structure.imbiss");
+
+	my $task_error = "";
+
+	$task_error .= "Can not find data file: $sequence_imbiss\n"
+	  if ( !ZBH::SGE::is_file_exists($sequence_imbiss) );
+
+	$task_error .= "Can not find data file: $structure_imbiss\n"
+	  if ( !ZBH::SGE::is_file_exists($structure_imbiss) );
+
+	ZBH::Flensburg::fatal( 
+		"30configgraph", 
+		"Config-checker report",
+		$task_error );
+
 	return ("wait");
 }
 

@@ -13,6 +13,7 @@
 use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use Config::Simple;
+use ZBH::Flensburg;
 use ZBH::SGE;
 
 sub main {
@@ -20,13 +21,21 @@ sub main {
 
 	my $config = new Config::Simple($file);
 
-	my $exporter = $config->param("bin.exporter");
-	my $result_sequence = $config->param("result.sequence");
+	my $exporter         = $config->param("bin.exporter");
+	my $result_sequence  = $config->param("result.sequence");
 	my $result_structure = $config->param("result.structure");
 
-	unlink($result_sequence, $result_structure);
+	unlink( $result_sequence, $result_structure );
 
 	system("$exporter $result_sequence $result_structure");
+
+	ZBH::Flensburg::success(
+		"26exportimbiss",
+		"Data exporter report",
+		"Script: $exporter\n"
+		  . "Data exported to: $result_sequence\n"
+		  . "Data exported to: $result_structure\n"
+	);
 
 	return ("done");
 }

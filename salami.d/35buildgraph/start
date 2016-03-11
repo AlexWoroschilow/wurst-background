@@ -16,16 +16,17 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use Getopt::Lucid qw( :all );
 use Config::Simple;
+use ZBH::Flensburg;
 
 sub main {
 	my $file = shift;
 
 	my $config = new Config::Simple($file);
 
-	my $graph1 = $config->param("sequence.graph");
+	my $graph1  = $config->param("sequence.graph");
 	my $imbiss1 = $config->param("sequence.imbiss");
 
-	my $graph2 = $config->param("structure.graph");
+	my $graph2  = $config->param("structure.graph");
 	my $imbiss2 = $config->param("structure.imbiss");
 
 	my $first;
@@ -67,10 +68,15 @@ sub main {
 	}
 	close(GRAPH);
 	close(INPUT);
-	
-	return("done");
+
+	ZBH::Flensburg::success(
+		"35buildgraph",
+		"Data exporter report",
+		"Data exported to: $graph1\n Data exported to: $graph2\n"
+	);
+
+	return ("done");
 }
 
 exit( print( main( "$FindBin::Bin/../../etc/graph.cnf", ) ) );
-
 

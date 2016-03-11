@@ -13,15 +13,38 @@
 use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use Config::Simple;
+use ZBH::Flensburg;
+use ZBH::SGE;
 
 sub main {
 	my $file = shift;
 
 	my $config = new Config::Simple($file);
 
-	# TODO: notify maintainer about wrong config
-	# write xml for salami rss server
-	# and send it over ssh to flensburg
+	my $sequence_graph  = $config->param("sequence.graph");
+	my $structure_graph = $config->param("structure.graph");
+	my $script_status   = $config->param("bin.status");
+	my $script_starter  = $config->param("bin.starter");
+
+	my $task_error = "";
+
+	$task_error .= "Can not find data file: $sequence_graph\n"
+	  if ( !ZBH::SGE::is_file_exists($sequence_graph) );
+
+	$task_error .= "Can not find data file: $structure_graph\n"
+	  if ( !ZBH::SGE::is_file_exists($structure_graph) );
+
+	$task_error .= "Can not find script file: $script_status\n"
+	  if ( !ZBH::SGE::is_file_exists($script_status) );
+
+	$task_error .= "Can not find script file: $script_starter\n"
+	  if ( !ZBH::SGE::is_file_exists($script_starter) );
+
+	ZBH::Flensburg::fatal( 
+		"40configcluster", 
+		"Config-checker report",
+		$task_error );
+
 	return ("wait");
 }
 

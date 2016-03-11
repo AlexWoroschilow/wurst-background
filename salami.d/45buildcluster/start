@@ -13,12 +13,14 @@
 use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use Config::Simple;
+use ZBH::Flensburg;
 
 sub main {
 	my $file = shift;
+	my $date = time;
 
 	my $config = new Config::Simple($file);
-	$config->param( "settings.lastrun", time );
+	$config->param( "settings.lastrun", $date );
 	$config->write($file);
 
 	my $starter = $config->param("bin.starter");
@@ -31,6 +33,17 @@ sub main {
 
 	system("nohup $starter $graph1 $cluster1 >/dev/null 2>&1 &");
 	system("nohup $starter $graph2 $cluster2 >/dev/null 2>&1 &");
+
+	ZBH::Flensburg::success(
+		"45buildcluster",
+		"Script starter report",
+		"Script: $starter started at: $date\n"
+		  . "convert graph: $graph1 \n"
+		  . "to  cluster: $cluster1 \n"
+		  . "Script: $starter started at: $date\n"
+		  . "convert graph: $graph2 \n" 
+		  . "to  cluster: $cluster2 \n"
+	);
 
 	return ("wait");
 }

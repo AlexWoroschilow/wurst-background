@@ -18,8 +18,9 @@ use Config::Simple;
 use strict;
 use warnings;
 use File::Basename;
-use ZBH::SGE;
+use ZBH::Flensburg;
 use ZBH::Merge;
+use ZBH::SGE;
 
 sub main ($) {
 	my $file = shift;
@@ -94,6 +95,18 @@ sub main ($) {
 		}
 	}
 	close(MERGE);
+
+	
+	ZBH::Flensburg::success( 
+		"55buildmerge", 
+		"Data merge report",
+		"Merge file: $sequence_graph\n"
+			."Merge file: $sequence_cluster\n"
+			."Merge file: $structure_graph\n"
+			."Merge file: $structure_cluster\n"
+			."to: $output\n"
+
+		 );
 	
 	return ("done");
 }

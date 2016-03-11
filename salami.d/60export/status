@@ -21,12 +21,18 @@ use ZBH::SGE;
 sub main {
 	my $file = shift;
 
-	my $config = new Config::Simple($file);
-	my $source = $config->param("result.source");
+	my $config      = new Config::Simple($file);
+	my $source      = $config->param("result.source");
+	my $destination = $config->param("result.destination");
+
+	return ("done")
+	  if ( ZBH::SGE::is_folder_empty($source)
+		&& !ZBH::SGE::is_folder_empty($destination) );
 
 	return ("ready")
-	  if ( ZBH::SGE::is_file_exists( $source ) );
-
+	  if ( ZBH::SGE::is_file_exists($source)
+		&& !ZBH::SGE::is_folder_empty($source) );
+		
 	return ("wait");
 }
 exit( print( main( "$FindBin::Bin/../../etc/export.cnf", ) ) );

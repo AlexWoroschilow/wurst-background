@@ -17,14 +17,29 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use Getopt::Lucid qw( :all );
 use Config::Simple;
+use ZBH::Flensburg;
+use ZBH::SGE;
 
 sub main {
 	my $file   = shift;
 	my $config = new Config::Simple($file);
 
-	# TODO: notify maintainer about wrong config
-	# write xml for salami rss server
-	# and send it over ssh to flensburg
+	my $status  = $config->param("bin.status");
+	my $starter = $config->param("bin.starter");
+
+	my $string_error = "";
+
+	$string_error .= "Can not find script file: $status\n"
+	  if ( !ZBH::SGE::is_file_exists($status) );
+
+	$string_error .= "Can not find script file: $starter\n"
+	  if ( !ZBH::SGE::is_file_exists($starter) );
+
+	ZBH::Flensburg::fatal( 
+		"00configvec", 
+		"Config-checker report",
+		$string_error );
+
 	return ("wait");
 }
 

@@ -1,18 +1,17 @@
 ; Config::Simple 4.59
-; Thu Mar 10 17:14:13 2016
+; Thu Mar 10 18:19:20 2016
 
 [result]
 structure=/home/other/wurst/wurst-background/var/structure.csv
 sequence=/home/other/wurst/wurst-background/var/sequence.csv
 
+[settings]
+interval=604800
+lastrun=1457630360
+
 [bin]
-exporter=/home/other/wurst/wurst-background/projects/wurst-imbiss/exporter
 status=/home/other/wurst/wurst-background/projects/wurst-imbiss/status
 starter=/home/other/wurst/wurst-background/projects/wurst-imbiss/starter
-
-[settings]
-lastrun=1457626453
-# Rebuild vectores every week(in seconds)
-interval=604800
+exporter=/home/other/wurst/wurst-background/projects/wurst-imbiss/exporter
 
 

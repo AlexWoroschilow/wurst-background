@@ -20,6 +20,12 @@ sub is_file_exists {
 	return ( ( -d $file ) || ( -e $file ) );
 }
 
+sub is_folder_empty {
+    my $dirname = shift;
+    opendir(my $dh, $dirname) or die "Not a directory";
+    return scalar(grep { $_ ne "." && $_ ne ".." } readdir($dh)) == 0;
+}
+
 sub is_background_process_sge ($) {
 	my $starter = shift;
 	my $name = substr( $starter, rindex( $starter, "/" ) + 1 );

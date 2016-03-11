@@ -26,6 +26,7 @@ sub main {
 
 	my $result = `$status`;
 	
+	
 	return ("wait") if ( $result eq "started" );
 
 	if ( $result eq "done" ) {

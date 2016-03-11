@@ -17,6 +17,7 @@ use lib "$FindBin::Bin/../../lib/perl";
 use Getopt::Lucid qw( :all );
 use Config::Simple;
 use ZBH::SGE;
+use ZBH::Flensburg;
 
 sub main {
 	my $file   = shift;
@@ -25,7 +26,7 @@ sub main {
 	return ("done")
 	  if ( ZBH::SGE::is_file_exists( $config->param("bin.status") )
 		|| ZBH::SGE::is_file_exists( $config->param("bin.starter") ) );
-
+	
 	return ("ready");
 }
 exit( print( main("$FindBin::Bin/../../etc/vector.cnf") ) );

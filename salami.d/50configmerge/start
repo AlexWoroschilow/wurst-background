@@ -15,15 +15,36 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use Config::Simple;
+use ZBH::Flensburg;
+use ZBH::SGE;
 
 sub main {
 	my $file = shift;
 
-	my $config = new Config::Simple($file);
+	my $config            = new Config::Simple($file);
+	my $sequence_graph    = $config->param("sequence.graph");
+	my $sequence_cluster  = $config->param("sequence.cluster");
+	my $structure_graph   = $config->param("structure.graph");
+	my $structure_cluster = $config->param("structure.cluster");
 
-	# TODO: notify maintainer about wrong config
-	# write xml for salami rss server
-	# and send it over ssh to flensburg
+	my $task_error = "";
+	$task_error .= "Can not find data file: $sequence_graph\n"
+	  if ( !ZBH::SGE::is_file_exists($sequence_graph) );
+
+	$task_error .= "Can not find data file: $sequence_cluster\n"
+	  if ( !ZBH::SGE::is_file_exists($sequence_cluster) );
+
+	$task_error .= "Can not find data file: $structure_graph\n"
+	  if ( !ZBH::SGE::is_file_exists($structure_graph) );
+
+	$task_error .= "Can not find data file: $structure_cluster\n"
+	  if ( !ZBH::SGE::is_file_exists($structure_cluster) );
+
+	ZBH::Flensburg::fatal( 
+		"50configmerge", 
+		"Config-checker report",
+		$task_error );
+
 	return ("wait");
 }
 

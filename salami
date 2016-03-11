@@ -20,8 +20,8 @@ from que.queue import Queue
 
 if __name__ == "__main__":
     parser = OptionParser()
-    parser.add_option("-t", "--task", default=None, dest="task", help="enable debug mode")
-    parser.add_option("-q", "--queue", action="store_true", default=False, dest="queue", help="show devices")
+    parser.add_option("-q", "--queue", action="store_true", default=False, dest="queue", help="show tasks")
+    parser.add_option("-t", "--task", default=None, dest="task", help="run task by name")
 
 
     (options, args) = parser.parse_args()

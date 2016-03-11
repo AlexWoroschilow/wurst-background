@@ -19,6 +19,8 @@ use Config::Simple;
 use ZBH::SGE;
 use File::Copy;
 use File::Path qw(make_path remove_tree);
+use ZBH::Flensburg;
+use ZBH::SGE;
 
 sub main {
 	my $file = shift;
@@ -30,6 +32,13 @@ sub main {
 	remove_tree("$destination");
 	move( $source, $destination ) or return ("failure");
 	make_path("$source") or return ("failure");
+
+	ZBH::Flensburg::success(
+		"60export",
+		"Data exporter report",
+		"You can find all files here: $destination"
+	);
+
 	return ("done");
 }
 exit( print( main( "$FindBin::Bin/../../etc/export.cnf", ) ) );

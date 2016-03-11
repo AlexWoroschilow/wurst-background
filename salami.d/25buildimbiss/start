@@ -14,17 +14,25 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use Config::Simple;
 use ZBH::SGE;
+use ZBH::Flensburg;
 
 sub main {
 	my $file = shift;
+	my $date = time;
 
 	my $config = new Config::Simple($file);
-	$config->param( "settings.lastrun", time );
+	$config->param( "settings.lastrun", $date );
 	$config->write($file);
 
 	my $starter = $config->param("bin.starter");
 
 	system("nohup $starter >/dev/null 2>&1 &");
+
+	ZBH::Flensburg::success(
+		"25buildimbiss",
+		"Task starter report",
+		"Script: $starter started at: $date "
+	);
 
 	return ("wait");
 }
