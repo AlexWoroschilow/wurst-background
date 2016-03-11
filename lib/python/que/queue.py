@@ -144,7 +144,7 @@ class Queue(object):
         collection = [task for task in self.tasks]
         collection.sort(reverse=False)
         for task in collection:
-            self._logger.info("%s - start" % task.name)
+            self._logger.debug("%s - start" % task.name)
             process = TaskRunner(task)
             status = process.start()
             self._logger.info("%s - %s" % (task.name, process.status))

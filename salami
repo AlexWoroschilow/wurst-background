@@ -23,7 +23,7 @@ if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option("-q", "--queue", action="store_true", default=False, dest="queue", help="show tasks")
     parser.add_option("-t", "--task", default=None, dest="task", help="run task by name")
-    parser.add_option("-l", "--loglevel", default=logging.DEBUG, dest="loglevel", help="logging level")
+    parser.add_option("-l", "--loglevel", default=logging.INFO, dest="loglevel", help="logging level")
     parser.add_option("-f", "--format", default="%(asctime)s\t- %(levelname)s\t- %(name)s - %(message)s", dest="format", help="format for log string")
 
     (options, args) = parser.parse_args()
