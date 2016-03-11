@@ -43,7 +43,9 @@ sub main {
 	ZBH::Flensburg::fatal( 
 		"50configmerge", 
 		"Config-checker report",
-		$task_error );
+		"$task_error\n" 
+			. "Check your config file: $file"
+	);
 
 	return ("wait");
 }
