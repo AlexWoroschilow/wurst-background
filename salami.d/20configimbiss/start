@@ -37,10 +37,12 @@ sub main {
 	$string_error .= "Can not find script file: $script_exporter\n"
 	  if ( !ZBH::SGE::is_file_exists($script_exporter) );
 
-	ZBH::Flensburg::fatal( 
-		"20configimbiss", 
+	ZBH::Flensburg::fatal(
+		"20configimbiss",
 		"Config-checker report",
-		$string_error );
+		"$string_error\n" 
+			. "Check your config file: $file"
+	);
 
 	return ("wait");
 }
