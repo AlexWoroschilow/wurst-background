@@ -14,10 +14,14 @@ import re
 import glob
 import sys
 import subprocess
+import logging
+
 from time import sleep
 
 class Task(object):
     def __init__(self, path):
+        self._logger = logging.getLogger('task')
+        self._logger.debug(path)        
         self._path = path
         pass
 
@@ -39,7 +43,6 @@ class Task(object):
     @property
     def status(self):
         return "%s/status" % self._path
-
 
     @property
     def name(self):
@@ -64,42 +67,10 @@ class Task(object):
             return self.name
 
 
-class Queue(object):
-    def __init__(self, path):
-        self._path = path
-        pass
-
-    @property
-    def tasks(self):
-        for task in glob.glob(self._path):
-            yield Task(task)
-
-    def queue(self):
-        collection = [task for task in self.tasks]
-        collection.sort(reverse=False)
-        for task in collection:
-            print(task)
-
-    def start(self, name=None):
-        if name is not None:
-            return self.start_task(name)
-
-        collection = [task for task in self.tasks]
-        collection.sort(reverse=False)
-        for task in collection:
-            process = TaskRunner(task)
-            if not process.start() :
-                break
-            
-            
-    def start_task(self, name=None):
-        for task in self.tasks:
-            if task.name == name:
-                process = TaskRunner(task)
-                return process.start()
-            
 class TaskRunner(object):
     def __init__(self, task):
+        self._logger = logging.getLogger('task-runner')
+        self._logger.debug(task.name)        
         self._status = None
         self._task = task
         pass
@@ -111,8 +82,7 @@ class TaskRunner(object):
     @status.setter
     def status(self, value):
         self._status = value.decode('utf-8')
-        print(self._task.name, "\t", self._status)
-    
+
     @property
     def is_done(self):
         return self.status == 'done'
@@ -128,17 +98,64 @@ class TaskRunner(object):
     @property
     def is_failure(self):
         return self.status == 'failure'
-    
+
+    def _start(self, script):
+        with subprocess.Popen([self._task.status], stdout=subprocess.PIPE) as process:
+            self._logger.debug("start - %s" % self._task.status)        
+            self.status, stderrdata = process.communicate()
+            self._logger.debug("%s - %s" % (self.status, self._task.status))
+            return True
+        self._logger.error("can not start script: %s " % script)
+        return False
     
     def start(self):
-        with subprocess.Popen([self._task.status], stdout=subprocess.PIPE) as process:
-            self.status, stderrdata = process.communicate()
+        for script in [self._task.status, self._task.start]:
+            if not self._start(script):
+                return False            
+            if self.is_failure or self.is_wait:
+                return False
             if self.is_done:
-                return True            
-            if self.is_ready:
-                with subprocess.Popen([self._task.start], stdout=subprocess.PIPE) as process:
-                    self.status, stderrdata = process.communicate()
-                    if self.is_done:
-                        return True
-        return False
+                return True
+        return True
+
+
+class Queue(object):
+    def __init__(self, path):
+        self._path = path        
+        self._logger = logging.getLogger('queue')
+        self._logger.debug("folder with tasks: %s" % path)
+        pass
+
+    @property
+    def tasks(self):
+        for task in glob.glob(self._path):
+            yield Task(task)
+
+    def queue(self):
+        collection = [task for task in self.tasks]
+        collection.sort(reverse=False)
+        for task in collection:
+            print(task)
+            
+    def start(self, name=None):
+        if name is not None:
+            return self.start_task(name)
+
+        collection = [task for task in self.tasks]
+        collection.sort(reverse=False)
+        for task in collection:
+            self._logger.info("%s - start" % task.name)
+            process = TaskRunner(task)
+            status = process.start()
+            self._logger.info("%s - %s" % (task.name, process.status))
+            if not status :
+                break
+
+            
+    def start_task(self, name=None):
+        for task in self.tasks:
+            if task.name == name:
+                self._logger.info(name)
+                process = TaskRunner(task)
+                return process.start()
 
