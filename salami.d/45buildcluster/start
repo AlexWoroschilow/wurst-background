@@ -34,7 +34,7 @@ sub main {
 	system("nohup $starter $graph1 $cluster1 >/dev/null 2>&1 &");
 	system("nohup $starter $graph2 $cluster2 >/dev/null 2>&1 &");
 
-	ZBH::Flensburg::success(
+	ZBH::Flensburg::info(
 		"45buildcluster",
 		"Script starter report",
 		"Script: $starter started at: $date\n"

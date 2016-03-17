@@ -90,7 +90,7 @@ sub success($ $ $) {
 
 sub pending($ $ $) {
 	my $task_name          = shift;
-	my $task_status        = "success";
+	my $task_status        = "pending";
 	my $task_status_notice = shift;
 	my $task_status_error  = shift;
 	my $task_status_fatal  = "";
@@ -109,6 +109,30 @@ sub pending($ $ $) {
 	
 	return 0;
 }
+
+sub info($ $ $) {
+	my $task_name          = shift;
+	my $task_status        = "info";
+	my $task_status_notice = shift;
+	my $task_status_error  = "";
+	my $task_status_fatal  = "";
+	my $task_status_log    = shift;
+	my $task_date          = time;
+
+	my $file = response_file_xml(
+		$task_name,         $task_status,       $task_status_notice,
+		$task_status_error, $task_status_fatal, $task_status_log,
+	);
+
+	if ( transport_to_flensburg($file) ) {
+		unlink($file);
+		return 1;
+	}
+	
+	return 0;
+}
+
+
 
 sub transport_to_flensburg {
 

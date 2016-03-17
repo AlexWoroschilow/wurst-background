@@ -1,11 +1,12 @@
 ; Config::Simple 4.59
-; Tue Mar  8 17:12:13 2016
-
-[settings]
-lastrun=1457453533
-# Rebuild vectores every week(in seconds)
-interval=604800
+; Thu Mar 17 17:28:49 2016
 
 [bin]
 starter=/home/other/wurst/wurst-background/projects/wurst-vector/starter
 status=/home/other/wurst/wurst-background/projects/wurst-vector/status
+
+[settings]
+lastrun=1458232129
+interval=604800
+
+

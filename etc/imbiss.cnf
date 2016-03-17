@@ -6,12 +6,10 @@ structure=/home/other/wurst/wurst-background/var/structure.csv
 sequence=/home/other/wurst/wurst-background/var/sequence.csv
 
 [settings]
-interval=604800
+interval=1814400
 lastrun=1457630360
 
 [bin]
 status=/home/other/wurst/wurst-background/projects/wurst-imbiss/status
 starter=/home/other/wurst/wurst-background/projects/wurst-imbiss/starter
 exporter=/home/other/wurst/wurst-background/projects/wurst-imbiss/exporter
-
-

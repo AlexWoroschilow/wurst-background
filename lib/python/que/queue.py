@@ -100,10 +100,10 @@ class TaskRunner(object):
         return self.status == 'failure'
 
     def _start(self, script):
-        with subprocess.Popen([self._task.status], stdout=subprocess.PIPE) as process:
-            self._logger.debug("start - %s" % self._task.status)        
+        with subprocess.Popen([script], stdout=subprocess.PIPE) as process:
+            self._logger.debug("start - %s" % script)        
             self.status, stderrdata = process.communicate()
-            self._logger.debug("%s - %s" % (self.status, self._task.status))
+            self._logger.debug("%s - %s" % (self.status, script))
             return True
         self._logger.error("can not start script: %s " % script)
         return False

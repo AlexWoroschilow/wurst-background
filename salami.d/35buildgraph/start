@@ -16,10 +16,17 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use Getopt::Lucid qw( :all );
 use Config::Simple;
+use ZBH::Local;
 use ZBH::Flensburg;
+use File::Basename;
 
 sub main {
 	my $file = shift;
+
+	my $script = basename($0);
+	if ( ZBH::Local::is_background_process( $script ) ) {
+		return ("wait");
+	}
 
 	my $config = new Config::Simple($file);
 

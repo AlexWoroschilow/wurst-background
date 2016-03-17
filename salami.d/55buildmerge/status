@@ -23,8 +23,8 @@ sub main {
 
 	my $config = new Config::Simple($file);
 
-	return ("wait")
-	  if ( !ZBH::SGE::is_file_exists($config->param("sequence.graph"))
+	return ("wait") if ( 
+	  	!ZBH::SGE::is_file_exists($config->param("sequence.graph"))
 		|| !ZBH::SGE::is_file_exists($config->param("sequence.cluster"))
 		|| !ZBH::SGE::is_file_exists($config->param("structure.graph"))
 		|| !ZBH::SGE::is_file_exists($config->param("structure.cluster")) );

@@ -28,7 +28,7 @@ sub main {
 
 	system("nohup $starter >/dev/null 2>&1 &");
 
-	ZBH::Flensburg::success(
+	ZBH::Flensburg::info(
 		"10buildvec",
 		"Task starter report",
 		"Script: $starter started at: $date"

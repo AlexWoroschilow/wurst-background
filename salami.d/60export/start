@@ -20,10 +20,16 @@ use ZBH::SGE;
 use File::Copy;
 use File::Path qw(make_path remove_tree);
 use ZBH::Flensburg;
-use ZBH::SGE;
+use ZBH::Local;
+use File::Basename;
 
 sub main {
 	my $file = shift;
+
+	my $script = basename($0);
+	if ( ZBH::Local::is_background_process( $script ) ) {
+		return ("wait");
+	}
 
 	my $config      = new Config::Simple($file);
 	my $source      = $config->param("result.source");
