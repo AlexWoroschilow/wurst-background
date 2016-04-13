@@ -32,4 +32,4 @@ sub main {
 	return ("ready");
 }
 
-exit( print( main( "$FindBin::Bin/../../etc/cluster.cnf", ) ) );
+exit( not print( main( "$FindBin::Bin/../../etc/cluster.cnf", ) ) );

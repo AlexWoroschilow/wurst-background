@@ -40,4 +40,4 @@ sub main {
 
 	return ("wait");
 }
-exit( print( main( "$FindBin::Bin/../../etc/export.cnf", ) ) );
+exit( not print( main( "$FindBin::Bin/../../etc/export.cnf", ) ) );

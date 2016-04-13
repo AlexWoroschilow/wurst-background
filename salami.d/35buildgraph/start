@@ -80,5 +80,5 @@ sub main {
 	return ("done");
 }
 
-exit( print( main( "$FindBin::Bin/../../etc/graph.cnf", ) ) );
+exit( not print( main( "$FindBin::Bin/../../etc/graph.cnf", ) ) );
 

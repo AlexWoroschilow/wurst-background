@@ -34,11 +34,9 @@ sub is_folder_exists {
 
 sub is_background_process ($) {
 	my $starter = shift;
-	my $name = substr( $starter, rindex( $starter, "/" ) + 1 );
+	my $result = `ps aux`;
 
-	my $result = `ps -eo comm`;
-
-	return ( index( $result, $name ) > -1 );
+	return ( index( $result, $starter ) > -1 );
 }
 
 1;

@@ -48,4 +48,4 @@ sub main {
 	return ("wait");
 }
 
-exit( print( main( "$FindBin::Bin/../../etc/cluster.cnf", ) ) );
+exit( not print( main( "$FindBin::Bin/../../etc/cluster.cnf", ) ) );

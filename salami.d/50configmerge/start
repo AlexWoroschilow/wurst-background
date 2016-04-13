@@ -51,4 +51,4 @@ sub main {
 	return ("wait");
 }
 
-exit( print( main( "$FindBin::Bin/../../etc/merge.cnf", ) ) );
+exit( not print( main( "$FindBin::Bin/../../etc/merge.cnf", ) ) );

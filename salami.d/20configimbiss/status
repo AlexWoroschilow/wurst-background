@@ -32,4 +32,4 @@ sub main {
 	return ("ready");
 }
 
-exit( print( main( "$FindBin::Bin/../../etc/imbiss.cnf", ) ) );
+exit( not print( main( "$FindBin::Bin/../../etc/imbiss.cnf", ) ) );
