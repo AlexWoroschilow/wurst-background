@@ -26,11 +26,6 @@ use File::Basename;
 sub main {
 	my $file = shift;
 
-	my $script = basename($0);
-	if ( ZBH::Local::is_background_process( $script ) ) {
-		return ("wait");
-	}
-
 	my $config      = new Config::Simple($file);
 	my $source      = $config->param("result.source");
 	my $destination = $config->param("result.destination");

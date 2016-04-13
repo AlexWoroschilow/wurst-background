@@ -17,6 +17,7 @@ use lib "$FindBin::Bin/../../lib/perl";
 use Config::Simple;
 use ZBH::Flensburg;
 use ZBH::SGE;
+use ZBH::Local;
 
 sub main {
 	my $file = shift;
@@ -29,10 +30,10 @@ sub main {
 	my $task_error = "";
 
 	$task_error .= "Can not find data file: $sequence_imbiss\n"
-	  if ( !ZBH::SGE::is_file_exists($sequence_imbiss) );
+	  if ( !ZBH::Local::is_file_exists($sequence_imbiss) );
 
 	$task_error .= "Can not find data file: $structure_imbiss\n"
-	  if ( !ZBH::SGE::is_file_exists($structure_imbiss) );
+	  if ( !ZBH::Local::is_file_exists($structure_imbiss) );
 
 	ZBH::Flensburg::fatal( 
 		"30configgraph", 

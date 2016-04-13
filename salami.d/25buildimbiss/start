@@ -21,6 +21,7 @@ sub main {
 	my $date = time;
 
 	my $config = new Config::Simple($file);
+	
 	$config->param( "settings.lastrun", $date );
 	$config->write($file);
 

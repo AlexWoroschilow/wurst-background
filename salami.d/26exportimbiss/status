@@ -17,14 +17,20 @@ use lib "$FindBin::Bin/../../lib/perl";
 use Getopt::Lucid qw( :all );
 use Config::Simple;
 use ZBH::SGE;
+use ZBH::Local;
 
 sub main {
 	my $file = shift;
 
 	my $config = new Config::Simple($file);
 	my $status = $config->param("bin.status");
-	my $result = `$status`;
 
+	return ("done")
+	  if ( ZBH::Local::is_file_exists( $config->param("result.sequence") )
+		&& ZBH::Local::is_file_exists( $config->param("result.structure") ) );
+
+	my $result = `$status`;
+	
 	return ("ready") if ( $result eq "done" );
 	return ("wait");
 }

@@ -17,6 +17,7 @@ use lib "$FindBin::Bin/../../lib/perl";
 use Config::Simple;
 use ZBH::Flensburg;
 use ZBH::SGE;
+use ZBH::Local;
 
 sub main {
 	my $file = shift;
@@ -29,13 +30,13 @@ sub main {
 
 	my $string_error = "";
 	$string_error .= "Can not find script file: $script_status\n"
-	  if ( !ZBH::SGE::is_file_exists($script_status) );
+	  if ( !ZBH::Local::is_file_exists($script_status) );
 
 	$string_error .= "Can not find script file: $script_starter\n"
-	  if ( !ZBH::SGE::is_file_exists($script_starter) );
+	  if ( !ZBH::Local::is_file_exists($script_starter) );
 
 	$string_error .= "Can not find script file: $script_exporter\n"
-	  if ( !ZBH::SGE::is_file_exists($script_exporter) );
+	  if ( !ZBH::Local::is_file_exists($script_exporter) );
 
 	ZBH::Flensburg::fatal(
 		"20configimbiss",

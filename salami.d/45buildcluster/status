@@ -17,6 +17,7 @@ use lib "$FindBin::Bin/../../lib/perl";
 use Getopt::Lucid qw( :all );
 use Config::Simple;
 use ZBH::SGE;
+use ZBH::Local;
 
 sub main {
 	my $file = shift;
@@ -29,12 +30,12 @@ sub main {
 
 	return ("wait")
 	  if ( $result eq "started"
-		|| !ZBH::SGE::is_file_exists( $config->param("sequence.graph") )
-		|| !ZBH::SGE::is_file_exists( $config->param("structure.graph") ) );
+		|| !ZBH::Local::is_file_exists( $config->param("sequence.graph") )
+		|| !ZBH::Local::is_file_exists( $config->param("structure.graph") ) );
 
 	return ("ready")
-	  if ( !ZBH::SGE::is_file_exists( $config->param("sequence.cluster") )
-		|| !ZBH::SGE::is_file_exists( $config->param("structure.cluster") ) );
+	  if ( !ZBH::Local::is_file_exists( $config->param("sequence.cluster") )
+		|| !ZBH::Local::is_file_exists( $config->param("structure.cluster") ) );
 
 	my $todayrun = time;
 	my $lastrun  = $config->param("settings.lastrun");

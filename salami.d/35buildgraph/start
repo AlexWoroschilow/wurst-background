@@ -23,11 +23,6 @@ use File::Basename;
 sub main {
 	my $file = shift;
 
-	my $script = basename($0);
-	if ( ZBH::Local::is_background_process( $script ) ) {
-		return ("wait");
-	}
-
 	my $config = new Config::Simple($file);
 
 	my $graph1  = $config->param("sequence.graph");

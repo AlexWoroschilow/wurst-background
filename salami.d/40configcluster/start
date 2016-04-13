@@ -15,6 +15,7 @@ use lib "$FindBin::Bin/../../lib/perl";
 use Config::Simple;
 use ZBH::Flensburg;
 use ZBH::SGE;
+use ZBH::Local;
 
 sub main {
 	my $file = shift;
@@ -29,16 +30,16 @@ sub main {
 	my $task_error = "";
 
 	$task_error .= "Can not find data file: $sequence_graph\n"
-	  if ( !ZBH::SGE::is_file_exists($sequence_graph) );
+	  if ( !ZBH::Local::is_file_exists($sequence_graph) );
 
 	$task_error .= "Can not find data file: $structure_graph\n"
-	  if ( !ZBH::SGE::is_file_exists($structure_graph) );
+	  if ( !ZBH::Local::is_file_exists($structure_graph) );
 
 	$task_error .= "Can not find script file: $script_status\n"
-	  if ( !ZBH::SGE::is_file_exists($script_status) );
+	  if ( !ZBH::Local::is_file_exists($script_status) );
 
 	$task_error .= "Can not find script file: $script_starter\n"
-	  if ( !ZBH::SGE::is_file_exists($script_starter) );
+	  if ( !ZBH::Local::is_file_exists($script_starter) );
 
 	ZBH::Flensburg::fatal( 
 		"40configcluster", 

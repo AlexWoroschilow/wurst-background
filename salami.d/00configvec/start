@@ -19,6 +19,7 @@ use Getopt::Lucid qw( :all );
 use Config::Simple;
 use ZBH::Flensburg;
 use ZBH::SGE;
+use ZBH::Local;
 
 sub main {
 	my $file   = shift;
@@ -30,17 +31,16 @@ sub main {
 	my $string_error = "";
 
 	$string_error .= "Can not find script file: $status\n"
-	  if ( !ZBH::SGE::is_file_exists($status) );
+	  if ( !ZBH::Local::is_file_exists($status) );
 
 	$string_error .= "Can not find script file: $starter\n"
-	  if ( !ZBH::SGE::is_file_exists($starter) );
+	  if ( !ZBH::Local::is_file_exists($starter) );
 
-	ZBH::Flensburg::fatal( 
-		"00configvec", 
+	ZBH::Flensburg::fatal(
+		"00configvec",
 		"Config-checker report",
-		"$string_error\n" 
-			. "Check your config file: $file"
-		);
+		"$string_error\n" . "Check your config file: $file"
+	);
 
 	return ("wait");
 }

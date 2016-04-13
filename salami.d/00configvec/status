@@ -18,14 +18,15 @@ use Getopt::Lucid qw( :all );
 use Config::Simple;
 use ZBH::SGE;
 use ZBH::Flensburg;
+use ZBH::Local;
 
 sub main {
 	my $file   = shift;
 	my $config = new Config::Simple($file);
 
 	return ("done")
-	  if ( ZBH::SGE::is_file_exists( $config->param("bin.status") )
-		|| ZBH::SGE::is_file_exists( $config->param("bin.starter") ) );
+	  if ( ZBH::Local::is_file_exists( $config->param("bin.status") )
+		|| ZBH::Local::is_file_exists( $config->param("bin.starter") ) );
 	
 	return ("ready");
 }

@@ -17,6 +17,7 @@ use lib "$FindBin::Bin/../../lib/perl";
 use Getopt::Lucid qw( :all );
 use Config::Simple;
 use ZBH::SGE;
+use ZBH::Local;
 
 sub main {
 	my $file = shift;
@@ -24,9 +25,9 @@ sub main {
 	my $config = new Config::Simple($file);
 
 	return ("done")
-	  if ( ZBH::SGE::is_file_exists( $config->param("bin.status") )
-		&& ZBH::SGE::is_file_exists( $config->param("bin.starter") )
-		&& ZBH::SGE::is_file_exists( $config->param("bin.exporter") ) );
+	  if ( ZBH::Local::is_file_exists( $config->param("bin.status") )
+		&& ZBH::Local::is_file_exists( $config->param("bin.starter") )
+		&& ZBH::Local::is_file_exists( $config->param("bin.exporter") ) );
 
 	return ("ready");
 }

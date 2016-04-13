@@ -17,6 +17,7 @@ use lib "$FindBin::Bin/../../lib/perl";
 use Getopt::Lucid qw( :all );
 use Config::Simple;
 use ZBH::SGE;
+use ZBH::Local;
 
 sub main {
 	my $file = shift;
@@ -24,8 +25,8 @@ sub main {
 	my $config = new Config::Simple($file);
 
 	return ("done")
-	  if ( ZBH::SGE::is_file_exists( $config->param("sequence.imbiss") )
-		&& ZBH::SGE::is_file_exists( $config->param("structure.imbiss") ) );
+	  if ( ZBH::Local::is_file_exists( $config->param("sequence.imbiss") )
+		&& ZBH::Local::is_file_exists( $config->param("structure.imbiss") ) );
 		
 	return ("ready");
 }

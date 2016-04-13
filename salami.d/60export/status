@@ -16,7 +16,8 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use Getopt::Lucid qw( :all );
 use Config::Simple;
-use ZBH::SGE;
+use ZBH::Local;
+use File::Basename;
 
 sub main {
 	my $file = shift;
@@ -25,14 +26,18 @@ sub main {
 	my $source      = $config->param("result.source");
 	my $destination = $config->param("result.destination");
 
+	if ( ZBH::Local::is_background_process( dirname(__FILE__).'/start' ) ) {
+		return ("wait");
+	}
+
 	return ("done")
-	  if ( ZBH::SGE::is_folder_empty($source)
-		&& !ZBH::SGE::is_folder_empty($destination) );
+	  if ( ZBH::Local::is_folder_empty($source)
+		&& !ZBH::Local::is_folder_empty($destination) );
 
 	return ("ready")
-	  if ( ZBH::SGE::is_file_exists($source)
-		&& !ZBH::SGE::is_folder_empty($source) );
-		
+	  if ( ZBH::Local::is_folder_exists($source)
+		&& !ZBH::Local::is_folder_empty($source) );
+
 	return ("wait");
 }
 exit( print( main( "$FindBin::Bin/../../etc/export.cnf", ) ) );

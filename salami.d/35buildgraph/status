@@ -16,19 +16,24 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use Config::Simple;
 use ZBH::SGE;
+use ZBH::Local;
+use File::Basename;
 
 sub main {
 	my $file   = shift;
 	my $config = new Config::Simple($file);
 
-	#TODO: check process on local host
+	if ( ZBH::Local::is_background_process( dirname(__FILE__).'/start' ) ) {
+		return ("wait");
+	}
+	
 	return ("done")
-	  if ( ZBH::SGE::is_file_exists( $config->param("sequence.graph") )
-		&& ZBH::SGE::is_file_exists( $config->param("structure.graph") ) );
+	  if ( ZBH::Local::is_file_exists( $config->param("sequence.graph") )
+		&& ZBH::Local::is_file_exists( $config->param("structure.graph") ) );
 
 	return ("ready")
-	  if ( ZBH::SGE::is_file_exists( $config->param("sequence.imbiss") )
-		&& ZBH::SGE::is_file_exists( $config->param("structure.imbiss") ) );
+	  if ( ZBH::Local::is_file_exists( $config->param("sequence.imbiss") )
+		&& ZBH::Local::is_file_exists( $config->param("structure.imbiss") ) );
 
 	return ("wait");
 }

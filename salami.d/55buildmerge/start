@@ -27,11 +27,6 @@ use File::Basename;
 sub main ($) {
 	my $file = shift;
 
-	my $script = basename($0);
-	if ( ZBH::Local::is_background_process( $script ) ) {
-		return ("wait");
-	}
-
 	my $config = new Config::Simple($file);
 	$config->param( "settings.lastrun", time );
 	$config->write($file);
@@ -43,10 +38,10 @@ sub main ($) {
 	my $structure_cluster = $config->param("structure.cluster");
 
 	return ("failure")
-	  if ( !ZBH::SGE::is_file_exists($sequence_graph)
-		|| !ZBH::SGE::is_file_exists($sequence_cluster)
-		|| !ZBH::SGE::is_file_exists($structure_graph)
-		|| !ZBH::SGE::is_file_exists($structure_cluster) );
+	  if ( !ZBH::Local::is_file_exists($sequence_graph)
+		|| !ZBH::Local::is_file_exists($sequence_cluster)
+		|| !ZBH::Local::is_file_exists($structure_graph)
+		|| !ZBH::Local::is_file_exists($structure_cluster) );
 
 	my @structures       = ZBH::Merge::create_structure_list($sequence_graph);
 	my $structures_count = scalar(@structures);
