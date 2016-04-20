@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+# Copyright 2015 Alex Woroschilow (alex.woroschilow@gmail.com)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+use FindBin;
+use lib "$FindBin::Bin/../../lib/perl";
+use File::Path qw( make_path );
+
+use Config::Simple;
+use ZBH::Flensburg;
+use ZBH::SGE;
+
+sub main {
+	my $file = shift;
+	my $response = undef;
+
+	my $config = new Config::Simple($file);
+
+	my $alphabet     	  = $config->param("sources.alphabet");
+	
+	my $vector_folder     = $config->param("vector.folder");
+	my $vector_collection = $config->param("vector.collection");
+
+	my $sequence_folder     = $config->param("sequence.folder");
+	my $sequence_collection = $config->param("sequence.collection");
+
+	# Find all vector files
+	# and store it to some file
+	$response = `find $vector_folder -name "*.vec" > $vector_collection`;
+	# Convert vectors to sequences
+	# using some alphabet generated from Steve Hoffman
+	$response = `$FindBin::Bin/convertprobvec.x -f $vector_collection -a $alphabet`;
+
+	# Move al sequence files to 
+	# different sequence folder
+	if ( !-d $sequence_folder ) {
+		make_path($sequence_folder);
+	}	
+
+	$response = `find $vector_folder -type f -iname '*.seq' -exec mv -t $sequence_folder {} \+`;
+
+	# Find all sequence files
+	# and store it to some file
+	$response = `find $sequence_folder -name "*.seq" > $sequence_collection`;
+
+	ZBH::Flensburg::success( "11buildseq", "Task starter report",
+		"Generated files: $vector_collection started at: $sequence_collection"
+	);
+
+	return ("wait");
+}
+
+exit( not print( main("$FindBin::Bin/../../etc/buildseq.cnf") ) );

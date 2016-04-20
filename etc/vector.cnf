@@ -1,12 +1,12 @@
 ; Config::Simple 4.59
-; Thu Mar 17 17:28:49 2016
+; Wed Apr 13 17:47:34 2016
 
 [bin]
 starter=/home/other/wurst/wurst-background/projects/wurst-vector/starter
 status=/home/other/wurst/wurst-background/projects/wurst-vector/status
 
 [settings]
-lastrun=1458232129
+lastrun=1460562454
 interval=604800
 
 

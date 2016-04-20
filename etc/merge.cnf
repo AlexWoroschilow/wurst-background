@@ -1,15 +1,18 @@
 ; Config::Simple 4.59
-; Thu Mar 10 17:00:24 2016
+; Thu Apr 14 00:12:45 2016
 
-[result]
-output=/home/other/wurst/wurst-background/var/merge.csv
+[sequence]
+graph=/home/other/wurst/wurst-background/var/sequence.ncol
+cluster=/home/other/wurst/wurst-background/var/sequence.clust
 
 [structure]
 graph=/home/other/wurst/wurst-background/var/structure.ncol
 cluster=/home/other/wurst/wurst-background/var/structure.clust
 
-[sequence]
-cluster=/home/other/wurst/wurst-background/var/sequence.clust
-graph=/home/other/wurst/wurst-background/var/sequence.ncol
+[result]
+output=/home/other/wurst/wurst-background/var/merge.csv
+
+[settings]
+lastrun=1460585565
 
 

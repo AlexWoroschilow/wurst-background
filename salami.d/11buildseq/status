@@ -16,24 +16,27 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use Getopt::Lucid qw( :all );
 use Config::Simple;
-use ZBH::SGE;
 use ZBH::Local;
 
 sub main {
 	my $file = shift;
 
-	my $config = new Config::Simple($file);
-	my $status = $config->param("bin.status");
+	my $config  = new Config::Simple($file);
+
+	my $alphabet = $config->param("sources.alphabet");
+	if(!ZBH::Local::is_file_exists( $alphabet)) {
+		ZBH::Flensburg::fatal( "11buildseq", "Task starter report",
+			"Can not find alphabet file: $alphabet"
+		);
+		return ("wait")
+	}
 
 	return ("done")
-	  if ( ZBH::Local::is_file_exists( $config->param("result.sequence") )
-		&& ZBH::Local::is_file_exists( $config->param("result.structure") ) );
+	  if ( ZBH::Local::is_file_exists( $config->param("vector.collection") )
+		&& ZBH::Local::is_file_exists( $config->param("sequence.collection") ) );
 
-	my $result = `$status`;
-	
-	return ("ready") if ( $result eq "done" );
-	return ("wait");
+	return ("ready");
 }
 
-exit( not print( main( "$FindBin::Bin/../../etc/imbiss.cnf", ) ) );
+exit( not print( main("$FindBin::Bin/../../etc/buildseq.cnf") ) );
 

@@ -17,31 +17,26 @@ use lib "$FindBin::Bin/../../lib/perl";
 use Getopt::Lucid qw( :all );
 use Config::Simple;
 use ZBH::SGE;
+use ZBH::Local;
 
 sub main {
 	my $file = shift;
 
 	my $config  = new Config::Simple($file);
-	my $status  = $config->param("bin.status");
 
-	my $result = `$status`;
-	
-	
-	return ("wait") if ( $result eq "started" );
+	return("wait") if (
+		ZBH::SGE::is_background_process_sge("wurstimbiss")
+		|| ZBH::Local::is_background_process("wurstimbiss")
+	);
 
-	if ( $result eq "done" ) {
-		
-		my $todayrun = time;
-		my $lastrun  = $config->param("settings.lastrun");
-		my $interval = $config->param("settings.interval");
-		if ( ( $todayrun - $lastrun ) > $interval ) {
-			return ("ready");
-		}
+	# Check is all tasks successfully 
+	# finished and there are results
+	return ("done") if ( 
+		ZBH::SGE::is_background_process_done( "$FindBin::Bin/../../log/sequence.log", "100.000000 %" )
+		&& ZBH::SGE::is_background_process_done( "$FindBin::Bin/../../log/structure.log", "100.000000 %" ) );
 
-		return ("done");
-	}
 	return ("ready");
 }
 
-exit( not print( main( "$FindBin::Bin/../../etc/imbiss.cnf", ) ) );
+exit( not print( main( "$FindBin::Bin/../../etc/wurstimbiss.cnf", ) ) );
 

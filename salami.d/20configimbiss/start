@@ -23,29 +23,13 @@ sub main {
 	my $file = shift;
 
 	my $config = new Config::Simple($file);
+	my $seqlist = $config->param("requirements.sequences");
 
-	my $script_status   = $config->param("bin.status");
-	my $script_starter  = $config->param("bin.starter");
-	my $script_exporter = $config->param("bin.exporter");
-
-	my $string_error = "";
-	$string_error .= "Can not find script file: $script_status\n"
-	  if ( !ZBH::Local::is_file_exists($script_status) );
-
-	$string_error .= "Can not find script file: $script_starter\n"
-	  if ( !ZBH::Local::is_file_exists($script_starter) );
-
-	$string_error .= "Can not find script file: $script_exporter\n"
-	  if ( !ZBH::Local::is_file_exists($script_exporter) );
-
-	ZBH::Flensburg::fatal(
-		"20configimbiss",
-		"Config-checker report",
-		"$string_error\n" 
-			. "Check your config file: $file"
+	ZBH::Flensburg::fatal( "20configimbiss", "Config-checker report",
+		"Sequence list does not exists: $seqlist. You have to check config file: $file \n"
 	);
 
 	return ("wait");
 }
 
-exit( not print( main( "$FindBin::Bin/../../etc/imbiss.cnf", ) ) );
+exit( not print( main( "$FindBin::Bin/../../etc/wurstimbiss.cnf", ) ) );
