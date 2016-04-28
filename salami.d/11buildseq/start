@@ -32,6 +32,7 @@ sub main {
 	my $sequence_folder     = $config->param("sequence.folder");
 	my $sequence_collection = $config->param("sequence.collection");
 
+
 	# Find all vector files
 	# and store it to some file
 	$response = `find $vector_folder -name "*.vec" > $vector_collection`;
@@ -44,6 +45,7 @@ sub main {
 	if ( !-d $sequence_folder ) {
 		make_path($sequence_folder);
 	}	
+
 
 	$response = `find $vector_folder -type f -iname '*.seq' -exec mv -t $sequence_folder {} \+`;
 

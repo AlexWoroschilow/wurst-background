@@ -1,20 +1,20 @@
 ; Config::Simple 4.59
-; Wed Apr 13 17:28:35 2016
+; Thu Apr 28 16:02:18 2016
 
 [structure]
-cluster=/home/other/wurst/wurst-background/var/structure.clust
 graph=/home/other/wurst/wurst-background/var/structure.ncol
+cluster=/home/other/wurst/wurst-background/var/structure.clust
+
+[bin]
+status=/home/other/wurst/wurst-background/projects/wurst-cluster/status
+starter=/home/other/wurst/wurst-background/projects/wurst-cluster/starter
 
 [settings]
+lastrun=1461852138
 interval=999999999
-lastrun=1460561315
 
 [sequence]
 graph=/home/other/wurst/wurst-background/var/sequence.ncol
 cluster=/home/other/wurst/wurst-background/var/sequence.clust
-
-[bin]
-starter=/home/other/wurst/wurst-background/projects/wurst-cluster/starter
-status=/home/other/wurst/wurst-background/projects/wurst-cluster/status
 
 
