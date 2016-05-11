@@ -14,28 +14,38 @@ use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
-use Config::Simple;
 use ZBH::SGE;
 use ZBH::Local;
-use File::Basename;
+use Config::Simple;
+use ZBH::Flensburg;
 
 sub main {
-	my $file   = shift;
-	my $config = new Config::Simple($file);
+    my $file   = shift;
+    my $config = new Config::Simple($file);
 
-	if ( ZBH::Local::is_background_process( dirname(__FILE__).'/start' ) ) {
-		return ("wait");
-	}
-	
-	return ("done")
-	  if ( ZBH::Local::is_file_exists( $config->param("sequence.graph") )
-		&& ZBH::Local::is_file_exists( $config->param("structure.graph") ) );
+    my $process = "$FindBin::Bin/start";
+    if ( ZBH::Local::is_background_process( $process ) ) {
+      return ("wait");
+    }
+    
+    my $sequence_graph = $config->param("sequence.graph");
+    my $structure_graph = $config->param("structure.graph");
+    if (ZBH::Local::is_file_exists( $sequence_graph )
+	and ZBH::Local::is_file_exists( $structure_graph )) {
+	  return ("done");
+    }
+    
+    my $sequence_imbiss = $config->param("sequence.imbiss");
+    my $structure_imbiss = $config->param("structure.imbiss");
+    if (ZBH::Local::is_file_exists( $sequence_imbiss )
+	and ZBH::Local::is_file_exists( $structure_imbiss )) {
+	  return ("ready");
+    }
 
-	return ("ready")
-	  if ( ZBH::Local::is_file_exists( $config->param("sequence.imbiss") )
-		&& ZBH::Local::is_file_exists( $config->param("structure.imbiss") ) );
-
-	return ("wait");
+    ZBH::Flensburg::fatal( "25buildimbiss",  "Can not start task", 
+      "Can not find imbiss files: $sequence_imbiss, $structure_imbiss");
+    
+    return ("wait");
 }
 
 exit( not print( main( "$FindBin::Bin/../../etc/graph.cnf", ) ) );

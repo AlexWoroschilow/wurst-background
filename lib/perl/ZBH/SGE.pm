@@ -24,8 +24,7 @@ sub is_background_process ($) {
 	my $starter = shift;
 	my $name = substr( $starter, rindex( $starter, "/" ) + 1 );
 
-	my $result = `qstat -r -ext`;
-	print($result);
+	my $result = `qstat -r -ext 2>/dev/null`;
 
 	return ( index( $result, $name ) > -1 );
 }
@@ -40,7 +39,7 @@ sub is_background_process_started_sge ($) {
 	my $starter = shift;
 	my $name = substr( $starter, rindex( $starter, "/" ) + 1 );
 
-	my $result = `qstat -r -s r -ext`;
+	my $result = `qstat -r -s r -ext 2>/dev/null`;
 
 	return ( index( $result, $name ) > -1 );
 }
@@ -52,7 +51,7 @@ sub is_background_process_done ($ $) {
 
 	return 0 if (not is_file_exists($logfile));	
 
-	my $result = `tail -n 2 $logfile`;
+	my $result = `tail -n 2 $logfile 2>/dev/null`;
 	return ( index( $result, $keystring ) > -1 );
 }
 

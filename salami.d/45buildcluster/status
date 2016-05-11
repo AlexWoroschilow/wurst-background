@@ -14,37 +14,60 @@ use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
-use Getopt::Lucid qw( :all );
-use Config::Simple;
 use ZBH::SGE;
 use ZBH::Local;
+use Config::Simple;
+use ZBH::Flensburg;
 
 sub main {
-	my $file = shift;
+    my $file = shift;
 
-	my $config  = new Config::Simple($file);
-	my $starter = $config->param("bin.starter");
-	my $status  = $config->param("bin.status");
+    my $config  = new Config::Simple($file);
 
-	my $result = `$status`;
+    my $starter = $config->param("bin.starter");
+    if ( not ZBH::Local::is_file_exists($starter)) {
+      ZBH::Flensburg::fatal( "45buildcluster",  "Can not start task", 
+	"Executalbe file not found: $starter");
+      return("wait");
+    }	
+    
+    my $status  = $config->param("bin.status");
+    if ( not ZBH::Local::is_file_exists($status)) {
+      ZBH::Flensburg::fatal( "45buildcluster",  "Can not start task", 
+	"Executalbe file not found: $status");
+      return("wait");
+    }	
+	
+    my $result = ZBH::Local::execute("$status");
+    if ( $result eq "started" ) {
+      return ("wait") ;
+    }	   
+    
+    my $sequence_graph = $config->param("sequence.graph");
+    if ( not ZBH::Local::is_file_exists($sequence_graph)) {
+      ZBH::Flensburg::fatal( "45buildcluster",  "Can not start task", 
+	"Graph file not found: $sequence_graph");
+      return("wait");
+    }	
 
-	return ("wait")
-	  if ( $result eq "started"
-		|| !ZBH::Local::is_file_exists( $config->param("sequence.graph") )
-		|| !ZBH::Local::is_file_exists( $config->param("structure.graph") ) );
+    my $structure_graph = $config->param("structure.graph");
+    if ( not ZBH::Local::is_file_exists($structure_graph)) {
+      ZBH::Flensburg::fatal( "45buildcluster",  "Can not start task", 
+	"Graph file not found: $structure_graph");
+      return("wait");
+    }	    
+    
+    my $sequence_cluster = $config->param("sequence.cluster");
+    if ( not ZBH::Local::is_file_exists($structure_graph)) {
+      return ("ready");
+    }
 
-	return ("ready")
-	  if ( !ZBH::Local::is_file_exists( $config->param("sequence.cluster") )
-		|| !ZBH::Local::is_file_exists( $config->param("structure.cluster") ) );
+    my $structure_cluster = $config->param("structure.cluster");
+    if ( not ZBH::Local::is_file_exists($structure_graph)) {
+      return ("ready");
+    }
 
-	my $todayrun = time;
-	my $lastrun  = $config->param("settings.lastrun");
-	my $interval = $config->param("settings.interval");
-	if ( ( $todayrun - $lastrun ) > $interval ) {
-		return ("ready");
-	}
-
-	return ("done");
+    return ("done");
 }
 
 exit( not print( main( "$FindBin::Bin/../../etc/cluster.cnf", ) ) );

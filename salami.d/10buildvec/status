@@ -14,33 +14,45 @@ use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
-use Getopt::Lucid qw( :all );
+use ZBH::SGE;
+use ZBH::Local;
 use Config::Simple;
+use ZBH::Flensburg;
 
 sub main {
-	my $file = shift;
+    my $file = shift;
 
-	my $config  = new Config::Simple($file);
-	my $starter = $config->param("bin.starter");
-	my $status  = $config->param("bin.status");
+    my $config  = new Config::Simple($file);
 
-	my $result = `$status`;
-	return ("wait") if ( $result eq "started" );
-
-	if ( $result eq "done" ) {
-
-		my $todayrun = time;
-		my $lastrun  = $config->param("settings.lastrun");
-		my $interval = $config->param("settings.interval");
-
-		if ( ( $todayrun - $lastrun ) > $interval ) {
-			return ("ready");
-		}
-
-		return ("done");
-	}
-
-	return ("ready");
+    my $starter = $config->param("bin.starter");
+    if ( not ZBH::Local::is_file_exists($starter)) {
+      ZBH::Flensburg::fatal( "10buildvec",  "Can not start task", 
+	"Executalbe file not found: $starter");
+      return("wait");
+    }	
+    
+    my $status  = $config->param("bin.status");
+    if ( not ZBH::Local::is_file_exists($status)) {
+      ZBH::Flensburg::fatal( "10buildvec",  "Can not start task", 
+	"Executalbe file not found: $status");
+      return("wait");
+    }	
+    
+    my $result = ZBH::Local::execute("$status");
+    if ( $result eq "started" ) {
+      return ("wait") ;
+    }
+    
+    if ( $result eq "done" ) {
+      my $todayrun = time;
+      my $lastrun  = $config->param("settings.lastrun");
+      my $interval = $config->param("settings.interval");
+      if ( ( $todayrun - $lastrun ) > $interval ) {
+	      return ("ready");
+      }
+      return ("done");
+    }
+    return ("ready");
 }
 exit( not print( main("$FindBin::Bin/../../etc/vector.cnf") ) );
 

@@ -12,9 +12,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
-use Config::Simple;
 use ZBH::SGE;
+use ZBH::Local;
 use ZBH::Flensburg;
+use Config::Simple;
 
 sub main {
 	my $file = shift;
@@ -24,16 +25,42 @@ sub main {
 	
 	my $result_sequence = $config->param( "result.sequence");
 	my $result_structure = $config->param( "result.structure");
+
+	if (ZBH::Local::is_file_exists($result_sequence)) {
+	  unlink($result_sequence);
+	}
 	
-	unlink($result_sequence);
-	unlink($result_structure);
-		
-	system("qsub -S /bin/bash -wd $FindBin::Bin $FindBin::Bin/wurstimbiss.sh $FindBin::Bin/etc/sequence.cnf $result_sequence");
-	system("qsub -S /bin/bash -wd $FindBin::Bin $FindBin::Bin/wurstimbiss.sh $FindBin::Bin/etc/structure.cnf $result_structure");
+	if (ZBH::Local::is_file_exists($result_structure)) {
+	  unlink($result_structure);
+	}
+	
+	my $config_sequence = "$FindBin::Bin/etc/sequence.cnf";
+	if (not ZBH::Local::is_file_exists($config_sequence)) {
+	  ZBH::Flensburg::fatal( "25buildimbiss",  "Can not start task", 
+	    "Can not find config file: $config_sequence");
+	  return ("wait");
+	}
+
+	my $config_structure = "$FindBin::Bin/etc/structure.cnf";
+	if (not ZBH::Local::is_file_exists($config_structure)) {
+	  ZBH::Flensburg::fatal( "25buildimbiss",  "Can not start task", 
+	    "Can not find config file: $config_structure");
+	  return ("wait");
+	}
+
+	my $starter = "$FindBin::Bin/wurstimbiss.sh";
+	if (not ZBH::Local::is_file_exists($starter)) {
+	  ZBH::Flensburg::fatal( "25buildimbiss",  "Can not start task", 
+	    "Can not find config file: $starter");
+	  return ("wait");
+	}
+
+ 	system("qsub -S /bin/bash -wd $FindBin::Bin $starter $config_sequence $result_sequence");
+ 	system("qsub -S /bin/bash -wd $FindBin::Bin $starter $config_structure $result_structure");
 
 	ZBH::Flensburg::info( "25buildimbiss", "Task starter report",
-		"Started: $FindBin::Bin/wurstimbiss.sh $FindBin::Bin/etc/sequence.cnf $result_sequence\n".
-		"Started: $FindBin::Bin/wurstimbiss.sh $FindBin::Bin/etc/structure.cnf $result_structure\n"
+	  "Started: $starter $config_sequence $result_sequence\n".
+	  "Started: $starter $config_structure $result_structure\n"
 	);
 
 	return ("wait");

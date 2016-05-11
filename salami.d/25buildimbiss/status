@@ -14,26 +14,45 @@ use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
-use Getopt::Lucid qw( :all );
-use Config::Simple;
 use ZBH::SGE;
 use ZBH::Local;
+use Config::Simple;
+use ZBH::Flensburg;
 
 sub main {
 	my $file = shift;
 
 	my $config  = new Config::Simple($file);
+	
+	my $result_sequence = $config->param( "result.sequence");
+	my $result_structure = $config->param( "result.structure");	
 
-	return("wait") if (
-		ZBH::SGE::is_background_process_sge("wurstimbiss")
-		|| ZBH::Local::is_background_process("wurstimbiss")
-	);
-
-	# Check is all tasks successfully 
-	# finished and there are results
-	return ("done") if ( 
-		ZBH::SGE::is_background_process_done( "$FindBin::Bin/../../log/sequence.log", "100.000000 %" )
-		&& ZBH::SGE::is_background_process_done( "$FindBin::Bin/../../log/structure.log", "100.000000 %" ) );
+	my $process  = "wurstimbiss";
+	if (ZBH::Local::is_background_process($process) 
+	  or ZBH::SGE::is_background_process_sge($process)) {
+	  return("wait");
+	}	
+	
+	my $sequences = $config->param("requirements.sequences");
+	if ( not ZBH::Local::is_file_exists($sequences)) {
+	  ZBH::Flensburg::fatal( "25buildimbiss",  "Can not start task", 
+	    "Can not find sequence list: $sequences");
+	  return("wait");
+	}
+	
+	if (ZBH::Local::is_file_exists($result_sequence) 
+	    and ZBH::Local::is_file_exists($result_structure)) {
+	      my $keystring = "100.000000 %";
+	      my $seqlog = "$FindBin::Bin/../../log/sequence.log";
+	      my $strlog = "$FindBin::Bin/../../log/structure.log";
+	      if(ZBH::SGE::is_background_process_done($seqlog, $keystring) 
+		  and ZBH::SGE::is_background_process_done($strlog, $keystring)) {
+		    unlink($seqlog);
+		    unlink($strlog);
+		    return ("done");
+	      }
+	      return("wait");
+	}	
 
 	return ("ready");
 }

@@ -14,11 +14,10 @@ use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
-use Getopt::Lucid qw( :all );
-use Config::Simple;
+use ZBH::SGE;
 use ZBH::Local;
+use Config::Simple;
 use ZBH::Flensburg;
-use File::Basename;
 
 sub main {
 	my $file = shift;
@@ -27,9 +26,19 @@ sub main {
 
 	my $graph1  = $config->param("sequence.graph");
 	my $imbiss1 = $config->param("sequence.imbiss");
+	if (not ZBH::Local::is_file_exists( $imbiss1 )) {
+	  ZBH::Flensburg::fatal( "25buildimbiss",  "Can not start task", 
+	    "Can not find imbiss file: $imbiss1");
+	    return ("wait");
+	}
 
 	my $graph2  = $config->param("structure.graph");
 	my $imbiss2 = $config->param("structure.imbiss");
+	if (not ZBH::Local::is_file_exists( $imbiss2 )) {
+	  ZBH::Flensburg::fatal( "25buildimbiss",  "Can not start task", 
+	    "Can not find imbiss file: $imbiss2");
+	    return ("wait");
+	}
 
 	my $first;
 
@@ -52,6 +61,8 @@ sub main {
 	close(GRAPH);
 	close(INPUT);
 
+	
+	
 	open( INPUT, "<$imbiss2" ) or die "Could not open '$imbiss2' $!\n";
 	open( GRAPH, '>', "$graph2" );
 	$first = 1;
@@ -71,10 +82,8 @@ sub main {
 	close(GRAPH);
 	close(INPUT);
 
-	ZBH::Flensburg::success(
-		"35buildgraph",
-		"Data exporter report",
-		"Data exported to: $graph1\n Data exported to: $graph2\n"
+	ZBH::Flensburg::success( "35buildgraph", "Data exporter report",
+	  "Data exported to: $graph1\n Data exported to: $graph2\n"
 	);
 
 	return ("done");

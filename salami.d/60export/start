@@ -24,22 +24,32 @@ use ZBH::Local;
 use File::Basename;
 
 sub main {
-	my $file = shift;
+    my $file = shift;
 
-	my $config      = new Config::Simple($file);
-	my $source      = $config->param("result.source");
-	my $destination = $config->param("result.destination");
+    my $config = new Config::Simple($file);
 
-	remove_tree("$destination");
-	move( $source, $destination ) or return ("failure");
-	make_path("$source") or return ("failure");
+    my $source = $config->param("result.source");
+    if(not ZBH::Local::is_folder_exists( $source )) {
+      ZBH::Flensburg::fatal( "60export", "Task starter report",
+	"Vector folder does not exists: $source" );
+      return ("wait");
+    } 	    
+    
+    my $destination = $config->param("result.destination");
+    if(not ZBH::Local::is_folder_exists( $destination )) {
+      ZBH::Flensburg::fatal( "60export", "Task starter report",
+	"Vector folder does not exists: $destination" );
+      return ("wait");
+    } 	    	
+	
+    remove_tree("$destination");
+    move( $source, $destination ) or return ("failure");
+    make_path("$source") or return ("failure");
 
-	ZBH::Flensburg::success(
-		"60export",
-		"Data exporter report",
-		"You can find all files here: $destination"
-	);
+    ZBH::Flensburg::success( "60export", "Data exporter report",
+      "You can find all files here: $destination"
+    );
 
-	return ("done");
+    return ("done");
 }
 exit( not print( main( "$FindBin::Bin/../../etc/export.cnf", ) ) );

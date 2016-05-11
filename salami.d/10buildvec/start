@@ -12,29 +12,34 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
+use ZBH::SGE;
+use ZBH::Local;
 use Config::Simple;
 use ZBH::Flensburg;
-use ZBH::SGE;
+
 
 sub main {
-	my $file = shift;
-	my $date = time;
+    my $file = shift;
+    my $date = time;
 
-	my $config = new Config::Simple($file);
-	$config->param( "settings.lastrun", $date );
-	$config->write($file);
+    my $config = new Config::Simple($file);
+    $config->param( "settings.lastrun", $date );
+    $config->write($file);
 
-	my $starter = $config->param("bin.starter");
+    my $starter = $config->param("bin.starter");
+    if ( not ZBH::Local::is_file_exists($starter)) {
+      ZBH::Flensburg::fatal( "10buildvec",  "Can not start task", 
+	"Executalbe file not found: $starter");
+      return("wait");
+    }	
 
-	system("nohup $starter >/dev/null 2>&1 &");
+    ZBH::Local::background("$starter");
+    
+    ZBH::Flensburg::info("10buildvec", "Task starter report",
+      "Script: $starter started at: $date"
+    );
 
-	ZBH::Flensburg::info(
-		"10buildvec",
-		"Task starter report",
-		"Script: $starter started at: $date"
-	);
-
-	return ("wait");
+    return ("wait");
 }
 
 exit( not print( main("$FindBin::Bin/../../etc/vector.cnf") ) );

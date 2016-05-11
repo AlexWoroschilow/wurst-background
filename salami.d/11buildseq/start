@@ -17,6 +17,7 @@ use File::Path qw( make_path );
 use Config::Simple;
 use ZBH::Flensburg;
 use ZBH::SGE;
+use ZBH::Local;
 
 sub main {
 	my $file = shift;
@@ -24,38 +25,54 @@ sub main {
 
 	my $config = new Config::Simple($file);
 
-	my $alphabet     	  = $config->param("sources.alphabet");
+	my $alphabet = $config->param("sources.alphabet");
+	if(not ZBH::Local::is_file_exists( $alphabet )) {
+	  ZBH::Flensburg::fatal( "11buildseq", "Task starter report",
+	    "Can not find alphabet file: $alphabet" );
+	  return ("wait");
+	}
 	
-	my $vector_folder     = $config->param("vector.folder");
+	my $vector_folder = $config->param("vector.folder");
 	my $vector_collection = $config->param("vector.collection");
-
-	my $sequence_folder     = $config->param("sequence.folder");
-	my $sequence_collection = $config->param("sequence.collection");
-
+	if(not ZBH::Local::is_folder_exists( $vector_folder )) {
+	  ZBH::Flensburg::fatal( "11buildseq", "Task starter report",
+	    "Vector folder does not exists: $vector_folder" );
+	  return ("wait");
+	}
 
 	# Find all vector files
 	# and store it to some file
-	$response = `find $vector_folder -name "*.vec" > $vector_collection`;
+	ZBH::Local::execute("find $vector_folder -name '*.vec' > $vector_collection");
 	# Convert vectors to sequences
 	# using some alphabet generated from Steve Hoffman
-	$response = `$FindBin::Bin/convertprobvec.x -f $vector_collection -a $alphabet`;
+	my $convertor = "$FindBin::Bin/convertprobvec.x";
+	if(not ZBH::Local::is_file_exists( $convertor )) {
+	  ZBH::Flensburg::fatal( "11buildseq", "Can not start task",
+	    "Binary file not found: $convertor" );
+	  return ("wait");
+	}
+	
+	ZBH::Local::execute("$convertor -f $vector_collection -a $alphabet");	
 
+	my $sequence_folder = $config->param("sequence.folder");
+	my $sequence_collection = $config->param("sequence.collection");
 	# Move al sequence files to 
 	# different sequence folder
-	if ( !-d $sequence_folder ) {
-		make_path($sequence_folder);
+ 	if (not ZBH::Local::is_folder_exists($sequence_folder) ) {
+ 	    make_path($sequence_folder);
+	    if(not ZBH::Local::is_folder_exists( $sequence_folder )) {
+	      ZBH::Flensburg::fatal( "11buildseq", "Task starter report",
+		"Vector folder does not exists: $sequence_folder" );
+	      return ("wait");
+	    } 	
 	}	
+	
+	ZBH::Local::execute("find $vector_folder -type f -iname '*.seq' -exec mv -t $sequence_folder {} \+");	
+	ZBH::Local::execute("find $sequence_folder -name '*.seq' > $sequence_collection");	
 
-
-	$response = `find $vector_folder -type f -iname '*.seq' -exec mv -t $sequence_folder {} \+`;
-
-	# Find all sequence files
-	# and store it to some file
-	$response = `find $sequence_folder -name "*.seq" > $sequence_collection`;
-
-	ZBH::Flensburg::success( "11buildseq", "Task starter report",
-		"Generated files: $vector_collection started at: $sequence_collection"
-	);
+ 	ZBH::Flensburg::success( "11buildseq", "Task starter report",
+	    "Generated files: $vector_collection started at: $sequence_collection"
+ 	);
 
 	return ("wait");
 }

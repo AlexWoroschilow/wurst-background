@@ -14,30 +14,46 @@ use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
-use Getopt::Lucid qw( :all );
-use Config::Simple;
+use ZBH::SGE;
 use ZBH::Local;
-use File::Basename;
+use Config::Simple;
+use ZBH::Flensburg;
+
 
 sub main {
-	my $file = shift;
+    my $file = shift;
 
-	my $config      = new Config::Simple($file);
-	my $source      = $config->param("result.source");
-	my $destination = $config->param("result.destination");
+    my $config = new Config::Simple($file);
+    
+    my $source = $config->param("result.source");
+    if(not ZBH::Local::is_folder_exists( $source )) {
+      ZBH::Flensburg::fatal( "60export", "Task starter report",
+	"Vector folder does not exists: $source" );
+      return ("wait");
+    } 	    
+    
+    my $destination = $config->param("result.destination");
+    if(not ZBH::Local::is_folder_exists( $destination )) {
+      ZBH::Flensburg::fatal( "60export", "Task starter report",
+	"Vector folder does not exists: $destination" );
+      return ("wait");
+    } 	    
 
-	if ( ZBH::Local::is_background_process( dirname(__FILE__).'/start' ) ) {
-		return ("wait");
-	}
+    my $process = "$FindBin::Bin/start";
+    if ( ZBH::Local::is_background_process( $process ) ) {
+      return ("wait");
+    }
 
-	return ("done")
-	  if ( ZBH::Local::is_folder_empty($source)
-		&& !ZBH::Local::is_folder_empty($destination) );
+    if(ZBH::Local::is_folder_empty($source)
+      and not ZBH::Local::is_folder_empty($destination)) {
+	return ("done");
+    }
+    
+    if(ZBH::Local::is_folder_exists($source)
+	and not ZBH::Local::is_folder_empty($source)) {
+	  return ("ready");
+    }
 
-	return ("ready")
-	  if ( ZBH::Local::is_folder_exists($source)
-		&& !ZBH::Local::is_folder_empty($source) );
-
-	return ("wait");
+    return ("wait");
 }
 exit( not print( main( "$FindBin::Bin/../../etc/export.cnf", ) ) );

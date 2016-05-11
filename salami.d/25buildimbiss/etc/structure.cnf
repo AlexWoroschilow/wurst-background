@@ -26,7 +26,7 @@ binarypath=/work/public/no_backup/bm/pdb_all_bin
 
 # Path where a vector 
 # files are stored
-vectorpath=/work/public/no_backup/bm/pdb90_vec_6mer_struct
+vectorpath=/work/public/no_backup/bm/pdb_all_6mer_struct
 
 # Path to pdb structires 
 # files are stored

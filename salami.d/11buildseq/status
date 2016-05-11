@@ -14,28 +14,36 @@ use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
-use Getopt::Lucid qw( :all );
-use Config::Simple;
+use ZBH::SGE;
 use ZBH::Local;
+use Config::Simple;
+use ZBH::Flensburg;
 
 sub main {
-	my $file = shift;
+    my $file = shift;
 
-	my $config  = new Config::Simple($file);
+    my $config  = new Config::Simple($file);
 
-	my $alphabet = $config->param("sources.alphabet");
-	if(!ZBH::Local::is_file_exists( $alphabet)) {
-		ZBH::Flensburg::fatal( "11buildseq", "Task starter report",
-			"Can not find alphabet file: $alphabet"
-		);
-		return ("wait")
-	}
+    my $alphabet = $config->param("sources.alphabet");
+    if(not ZBH::Local::is_file_exists( $alphabet)) {
+      ZBH::Flensburg::fatal( "11buildseq", "Task starter report",
+	"Can not find alphabet file: $alphabet" );
+      return ("wait");
+    }
+    
+    my $process= "$FindBin::Bin/start";
+    if ( ZBH::Local::is_background_process($process) ) {
+      return ("wait");
+    }    
 
-	return ("done")
-	  if ( ZBH::Local::is_file_exists( $config->param("vector.collection") )
-		&& ZBH::Local::is_file_exists( $config->param("sequence.collection") ) );
+    my $vector_collection = $config->param("vector.collection");
+    my $sequence_collection = $config->param("sequence.collection");
+    if (ZBH::Local::is_file_exists( $vector_collection )
+	and ZBH::Local::is_file_exists( $sequence_collection )) {
+	  return ("done");
+    }
 
-	return ("ready");
+    return ("ready");
 }
 
 exit( not print( main("$FindBin::Bin/../../etc/buildseq.cnf") ) );
