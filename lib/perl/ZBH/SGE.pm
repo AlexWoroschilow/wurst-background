@@ -10,7 +10,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 package ZBH::SGE;
-@EXPORT    = qw(is_background_process is_background_process_sge is_background_process_started_sge is_background_process_done);
+@EXPORT    = qw(is_background_process is_background_process_sge is_background_process_started_sge is_background_process_done is_background_process_status);
 use strict;
 use warnings;
 use Data::Dump qw( dump pp );
@@ -54,5 +54,17 @@ sub is_background_process_done ($ $) {
 	my $result = `tail -n 2 $logfile 2>/dev/null`;
 	return ( index( $result, $keystring ) > -1 );
 }
+
+sub is_background_process_status ($ $) {
+	my $logfile   = shift;
+	my $keystring = shift;
+
+	return 0 if (not is_file_exists($logfile));	
+
+	my $result = `tail -n 2 $logfile`;
+	return ( index( $result, $keystring ) > -1 );
+}
+
+1;
 
 1;

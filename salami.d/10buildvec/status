@@ -13,46 +13,168 @@
 use warnings;
 
 use FindBin;
+use lib "/work/public/bm/salamiServer";
 use lib "$FindBin::Bin/../../lib/perl";
 use ZBH::SGE;
 use ZBH::Local;
 use Config::Simple;
 use ZBH::Flensburg;
 
+
+use Salamisrvini;
+use lib $LIB_LIB;     #initialize in local Salamisrvini.pm;
+use lib $LIB_ARCH;    #initialize in local Salamisrvini.pm;
+use vars qw ( $TMPDIR $INPUT_CLST_LIST $OUTPUT_BIN_DIR $OUTPUT_LIB_LIST $OUTPUT_ALL_LIST );
+use vars qw ( $OUTPUT_VEC6_DIR $OUTPUT_VEC7_DIR $OUTPUT_VEC_TAU_DIR $OUTPUT_VEC_TAU_ALL );
+use vars qw ( $OUTPUT_VEC6_DIR $OUTPUT_VEC7_DIR );
+
 sub main {
     my $file = shift;
 
     my $config  = new Config::Simple($file);
+    my $server  = shift;
+    my $planner = shift;
+    my $worker  = shift;
+        
+    $config->param( "planner.cluster",            $INPUT_CLST_LIST );
+    $config->param( "planner.source",             $PDB_TOP_DIR );
+    $config->param( "planner.temp",               $TMPDIR );
+    $config->param( "planner.output_bin",         $OUTPUT_BIN_DIR );
+    $config->param( "planner.output_vec_6",       $OUTPUT_VEC6_DIR );
+    $config->param( "planner.output_vec_6_all",   $OUTPUT_VEC6_ALL );
+    $config->param( "planner.output_vec_7",       $OUTPUT_VEC7_DIR );
+    $config->param( "planner.output_vec_7_all",   $OUTPUT_VEC7_ALL );
+    $config->param( "planner.output_vec_tau",     $OUTPUT_VEC_TAU_DIR );
+    $config->param( "planner.output_vec_tau_all", $OUTPUT_VEC_TAU_ALL );
+    $config->param( "planner.class_vec1",  	  $CLASSFILE );
+    $config->param( "planner.class_vec2",  	  $CA_CLASSFILE );
+    $config->param( "planner.outlist_lib", 	  $OUTPUT_LIB_LIST );
+    $config->param( "planner.outlist_all", 	  $OUTPUT_ALL_LIST );
 
-    my $starter = $config->param("bin.starter");
-    if ( not ZBH::Local::is_file_exists($starter)) {
+    $config->param( "planner.logfile", "$FindBin::Bin/../../log/planner.log" );
+    $config->param( "worker.logfile",  "$FindBin::Bin/../../log/worker.log" );
+    $config->param( "server.logfile",  "$FindBin::Bin/../../log/server.log" );
+
+    $config->write($file);
+
+    my $cluster  = $config->param("planner.cluster");    
+    if ( not ZBH::Local::is_file_exists($cluster)) {
       ZBH::Flensburg::fatal( "10buildvec",  "Can not start task", 
-	"Executalbe file not found: $starter");
+	"File not found: $cluster");
+      return("wait");
+    }    
+    
+    my $class_vec1  = $config->param("planner.class_vec1");    
+    if ( not ZBH::Local::is_file_exists($class_vec1)) {
+      ZBH::Flensburg::fatal( "10buildvec",  "Can not start task", 
+	"File not found: $class_vec1");
+      return("wait");
+    }	
+
+    my $class_vec2  = $config->param("planner.class_vec2");    
+    if ( not ZBH::Local::is_file_exists($class_vec2)) {
+      ZBH::Flensburg::fatal( "10buildvec",  "Can not start task", 
+	"File not found: $class_vec2");
+      return("wait");
+    }
+
+    my $temp  = $config->param("planner.temp");
+    if ( not length($temp)) {
+      ZBH::Flensburg::fatal( "10buildvec",  "Can not start task", 
+	"Folder name lenght can not be empty (temp)");
+      return("wait");
+    }	
+
+    my $source  = $config->param("planner.source");
+    if ( not length($source)) {
+      ZBH::Flensburg::fatal( "10buildvec",  "Can not start task", 
+	"Folder name lenght can not be empty (source)");
       return("wait");
     }	
     
-    my $status  = $config->param("bin.status");
-    if ( not ZBH::Local::is_file_exists($status)) {
+    my $output_bin  = $config->param("planner.output_bin");
+    if ( not length($output_bin)) {
       ZBH::Flensburg::fatal( "10buildvec",  "Can not start task", 
-	"Executalbe file not found: $status");
+	"Folder name lenght can not be empty (output_bin)");
       return("wait");
     }	
     
-    my $result = ZBH::Local::execute("$status");
-    if ( $result eq "started" ) {
-      return ("wait") ;
+    my $output_vec_6  = $config->param("planner.output_vec_6");
+    if ( not length($output_vec_6)) {
+      ZBH::Flensburg::fatal( "10buildvec",  "Can not start task", 
+	"Folder name lenght can not be empty (output_vec_6)");
+      return("wait");
+    }	
+
+    my $output_vec_6_all  = $config->param("planner.output_vec_6_all");
+    if ( not length($output_vec_6_all)) {
+      ZBH::Flensburg::fatal( "10buildvec",  "Can not start task", 
+	"Folder name lenght can not be empty (output_vec_6_all)");
+      return("wait");
+    }	    
+
+    my $output_vec_7  = $config->param("planner.output_vec_7");
+    if ( not length($output_vec_7)) {
+      ZBH::Flensburg::fatal( "10buildvec",  "Can not start task", 
+	"Folder name lenght can not be empty (output_vec_7)");
+      return("wait");
+    }	    
+    
+    my $output_vec_7_all  = $config->param("planner.output_vec_7_all");
+    if ( not length($output_vec_7_all)) {
+      ZBH::Flensburg::fatal( "10buildvec",  "Can not start task", 
+	"Folder name lenght can not be empty (output_vec_7_all)");
+      return("wait");
+    }	    
+
+    my $output_vec_tau  = $config->param("planner.output_vec_tau");
+    if ( not length($output_vec_tau)) {
+      ZBH::Flensburg::fatal( "10buildvec",  "Can not start task", 
+	"Folder name lenght can not be empty (output_vec_tau)");
+      return("wait");
+    }	    
+
+    my $output_vec_tau_all  = $config->param("planner.output_vec_tau_all");
+    if ( not length($output_vec_tau_all)) {
+      ZBH::Flensburg::fatal( "10buildvec",  "Can not start task", 
+	"Folder name lenght can not be empty (output_vec_tau_all)");
+      return("wait");
+    }	    
+    
+    my $outlist_lib  = $config->param("planner.outlist_lib");
+    if ( not length($outlist_lib)) {
+      ZBH::Flensburg::fatal( "10buildvec",  "Can not start task", 
+	"Folder name lenght can not be empty (outlist_lib)");
+      return("wait");
+    }	    
+    
+    if ( ZBH::Local::is_background_process($server)
+	|| ZBH::SGE::is_background_process_sge($server)) {
+	  return("wait");
     }
     
-    if ( $result eq "done" ) {
-      my $todayrun = time;
-      my $lastrun  = $config->param("settings.lastrun");
-      my $interval = $config->param("settings.interval");
-      if ( ( $todayrun - $lastrun ) > $interval ) {
-	      return ("ready");
+    my $todayrun = time;    
+    my $status = "wurst-vector done";
+    my $lastrun  = $config->param("settings.lastrun");
+    my $interval = $config->param("settings.interval");
+    my $logfile = $config->param("planner.logfile");
+    if (ZBH::SGE::is_background_process_status($logfile, $status)) {
+      if ( ( $todayrun - $lastrun ) >= $interval ) {
+	return ("ready");
       }
-      return ("done");
+      return("done");
     }
     return ("ready");
 }
-exit( not print( main("$FindBin::Bin/../../etc/vector.cnf") ) );
+
+exit( 
+  not print( 
+      main(
+	"$FindBin::Bin/../../etc/vector.cnf",
+	"$FindBin::Bin/bin/server.sh",   
+	"$FindBin::Bin/bin/planner.sh",
+	"$FindBin::Bin/bin/worker.sh"
+      ) 
+  ) 
+);
 

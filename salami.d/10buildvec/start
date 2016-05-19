@@ -20,26 +20,77 @@ use ZBH::Flensburg;
 
 sub main {
     my $file = shift;
-    my $date = time;
+    my $logging  = shift;    
+    my $server  = shift;
+    my $planner = shift;
+    my $worker  = shift;
 
     my $config = new Config::Simple($file);
-    $config->param( "settings.lastrun", $date );
+    $config->param( "settings.lastrun", time );
     $config->write($file);
 
-    my $starter = $config->param("bin.starter");
-    if ( not ZBH::Local::is_file_exists($starter)) {
-      ZBH::Flensburg::fatal( "10buildvec",  "Can not start task", 
-	"Executalbe file not found: $starter");
-      return("wait");
-    }	
+    if ( ZBH::SGE::is_background_process_sge($server)
+      || ZBH::SGE::is_background_process_sge($planner)
+      || ZBH::SGE::is_background_process_sge($worker) ) {
+	return ("wait");
+    }    
 
-    ZBH::Local::background("$starter");
+    my $temp = $config->param("planner.temp");
+    make_path( $temp ) if ( not ZBH::Local::is_folder_exists ( $temp ));
+    
+    my $output_bin = $config->param("planner.output_bin");
+    make_path( $output_bin ) if ( not ZBH::Local::is_folder_exists ( $output_bin ));
+
+    my $output_vec_6 = $config->param("planner.output_vec_6");
+    make_path( $output_vec_6 ) if ( not ZBH::Local::is_folder_exists ( $output_vec_6 ));
+        
+    my $output_vec_6_all = $config->param("planner.output_vec_6_all");
+    make_path( $output_vec_6_all ) if ( not ZBH::Local::is_folder_exists ( $output_vec_6_all ));
+
+    my $output_vec_7 = $config->param("planner.output_vec_7");
+    make_path( $output_vec_7 ) if ( not ZBH::Local::is_folder_exists ( $output_vec_7 ));
+
+    my $output_vec_7_all = $config->param("planner.output_vec_7_all");
+    make_path( $output_vec_7_all ) if ( not ZBH::Local::is_folder_exists ( $output_vec_7_all ));
+    
+    my $output_vec_tau = $config->param("planner.output_vec_tau");
+    make_path( $output_vec_tau ) if ( not ZBH::Local::is_folder_exists ( $output_vec_tau ));
+
+    my $output_vec_tau_all = $config->param("planner.output_vec_tau_all");
+    make_path( $output_vec_tau_all ) if ( not ZBH::Local::is_folder_exists ($output_vec_tau_all));
+
+    my $serverlog  = $config->param("server.logfile");
+    unlink($serverlog) if(ZBH::Local::is_file_exists($serverlog));
+    
+    my $workerlog  = $config->param("worker.logfile");    
+    unlink($workerlog) if(ZBH::Local::is_file_exists($workerlog));
+    
+    my $plannerlog = $config->param("planner.logfile");
+    unlink($plannerlog) if(ZBH::Local::is_file_exists($plannerlog));    
+    
+    ZBH::Local::background("qsub -S /bin/bash -wd $FindBin::Bin $server $file $logging");
+    while ( not ZBH::SGE::is_background_process_started_sge($server) ) {
+      sleep(1);    
+    }
+
+    ZBH::Local::background("qsub -S /bin/bash -wd $FindBin::Bin $worker $file $logging");
+    ZBH::Local::background("qsub -S /bin/bash -wd $FindBin::Bin $planner $file $logging");
     
     ZBH::Flensburg::info("10buildvec", "Task starter report",
       "Script: $starter started at: $date"
     );
-
+    
     return ("wait");
 }
 
-exit( not print( main("$FindBin::Bin/../../etc/vector.cnf") ) );
+exit( 
+  not print( 
+      main(
+	"$FindBin::Bin/../../etc/vector.cnf",
+	"$FindBin::Bin/etc/logging.cnf",
+	"$FindBin::Bin/bin/server.sh",   
+	"$FindBin::Bin/bin/planner.sh",
+	"$FindBin::Bin/bin/worker.sh"
+      ) 
+  ) 
+);

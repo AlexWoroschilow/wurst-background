@@ -85,19 +85,19 @@ class TaskRunner(object):
 
     @property
     def is_done(self):
-        return self.status == 'done'
+        return self.status.find('done') != -1
     
     @property
     def is_ready(self):
-        return self.status == 'ready'
+        return self.status.find('ready') != -1 
 
     @property
     def is_wait(self):
-        return self.status == 'wait'
+        return self.status.find('wait') != -1
 
     @property
     def is_failure(self):
-        return self.status == 'failure'
+        return self.status.find('failure') != -1
 
     def _start(self, script):
         with subprocess.Popen([script], stdout=subprocess.PIPE) as process:
@@ -112,10 +112,10 @@ class TaskRunner(object):
         for script in [self._task.status, self._task.start]:
             if not self._start(script):
                 return False            
-            if self.is_failure or self.is_wait:
-                return False
             if self.is_done:
                 return True
+            if self.is_failure or self.is_wait:
+                return False
         return True
 
 
