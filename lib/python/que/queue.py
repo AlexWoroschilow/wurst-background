@@ -49,19 +49,19 @@ class Task(object):
         return self.path[self.path.rfind('/') + 1:]
     
     def __eq__(self, other):
-        return not self.priority < other.priority and not other.priority < self.priority
+        return self.priority == other.priority
 
     def __ne__(self, other):
-        return self.priority < other.priority or other.priority < self.priority
+        return self.priority != other.priority
 
     def __gt__(self, other):
-        return other.priority < self.priority
+        return self.priority > other.priority 
 
     def __ge__(self, other):
-        return not self.priority < other.priority
+        return self.priority >= other.priority
 
     def __le__(self, other):
-        return not other.priority < self.priority    
+        return self.priority <= other.priority     
     
     def __str__(self):
             return self.name
