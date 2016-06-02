@@ -18,27 +18,36 @@ use ZBH::SGE;
 use ZBH::Local;
 use Config::Simple;
 use ZBH::Flensburg;
+use Log::Log4perl;
 
 sub main {
-	my $file = shift;
+  my $file = shift;
+  Log::Log4perl->init(shift);
 
-	my $config = new Config::Simple($file);
+  my $config = new Config::Simple($file);
+  my $logger = Log::Log4perl->get_logger("35buildgraph");
 
-	my $graph1  = $config->param("sequence.graph");
-	my $imbiss1 = $config->param("sequence.imbiss");
-	if (not ZBH::Local::is_file_exists( $imbiss1 )) {
-	  ZBH::Flensburg::fatal( "25buildimbiss",  "Can not start task", 
-	    "Can not find imbiss file: $imbiss1");
-	    return ("wait");
-	}
+  my $graph1 = $config->param("35buildgraph.sequence_graph");
+  $logger->info("Graph1: ", $graph1);
+  
+  my $imbiss1 = $config->param("35buildgraph.sequence_imbiss");
+  $logger->info("Imbiss1: ", $imbiss1);
+  
+  if (not ZBH::Local::is_file_exists( $imbiss1 )) {
+    $logger->fatal("Can not start task, can not find imbiss file: $imbiss1");
+    return ("error");
+  }
 
-	my $graph2  = $config->param("structure.graph");
-	my $imbiss2 = $config->param("structure.imbiss");
-	if (not ZBH::Local::is_file_exists( $imbiss2 )) {
-	  ZBH::Flensburg::fatal( "25buildimbiss",  "Can not start task", 
-	    "Can not find imbiss file: $imbiss2");
-	    return ("wait");
-	}
+  my $graph2  = $config->param("35buildgraph.structure_graph");
+  $logger->info("Graph2: ", $graph2 );
+  
+  my $imbiss2 = $config->param("35buildgraph.structure_imbiss");
+  $logger->info("Imbiss2: ", $imbiss2 );
+  
+  if (not ZBH::Local::is_file_exists( $imbiss2 )) {
+    $logger->fatal("Can not start task, can not find imbiss file: $imbiss2");
+    return ("error");
+  }
 
 	my $first;
 
@@ -89,5 +98,11 @@ sub main {
 	return ("done");
 }
 
-exit( not print( main( "$FindBin::Bin/../../etc/graph.cnf", ) ) );
-
+exit( 
+  not print( 
+    main( 
+      "$FindBin::Bin/../../etc/update.conf", 
+      "$FindBin::Bin/../../etc/logging.conf" ,
+    ) 
+  ) 
+);

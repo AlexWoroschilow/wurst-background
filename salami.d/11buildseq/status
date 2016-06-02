@@ -18,33 +18,50 @@ use ZBH::SGE;
 use ZBH::Local;
 use Config::Simple;
 use ZBH::Flensburg;
+use Log::Log4perl;
 
 sub main {
     my $file = shift;
+    Log::Log4perl->init(shift);
 
     my $config  = new Config::Simple($file);
+    my $logger  = Log::Log4perl->get_logger("11buildseq");
 
-    my $alphabet = $config->param("sources.alphabet");
-    if(not ZBH::Local::is_file_exists( $alphabet)) {
-      ZBH::Flensburg::fatal( "11buildseq", "Task starter report",
-	"Can not find alphabet file: $alphabet" );
-      return ("wait");
+    my $alphabet = $config->param("11buildseq.alphabet");
+    $logger->info( "11buildseq.alphabet: ", $alphabet );    
+    if(not ZBH::Local::is_file_exists( $alphabet)) {    
+      $logger->fatal( "Task starter report, can not find alphabet file: $alphabet" );
+      return ("error");
     }
     
     my $process= "$FindBin::Bin/start";
     if ( ZBH::Local::is_background_process($process) ) {
+      $logger->error( "Already started: ", $process );
       return ("wait");
     }    
 
-    my $vector_collection = $config->param("vector.collection");
-    my $sequence_collection = $config->param("sequence.collection");
+    my $vector_collection = $config->param("11buildseq.vector_collection");
+    $logger->info( "11buildseq.vector_collection: ", $vector_collection );
+    
+    my $sequence_collection = $config->param("11buildseq.sequence_collection");
+    $logger->info( "11buildseq.sequence_collection: ", $sequence_collection );
+    
     if (ZBH::Local::is_file_exists( $vector_collection )
 	and ZBH::Local::is_file_exists( $sequence_collection )) {
+	  $logger->info( "Done");
 	  return ("done");
     }
 
+    $logger->info( "Ready");
     return ("ready");
 }
 
-exit( not print( main("$FindBin::Bin/../../etc/buildseq.cnf") ) );
+exit( 
+  not print(  
+    main( 
+      "$FindBin::Bin/../../etc/update.conf", 
+      "$FindBin::Bin/../../etc/logging.conf" ,
+    ) 
+  ) 
+);
 

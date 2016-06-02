@@ -16,44 +16,58 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use ZBH::SGE;
 use ZBH::Local;
-use Config::Simple;
 use ZBH::Flensburg;
 
+use Config::Simple;
+use Log::Log4perl;
 
 sub main {
-    my $file = shift;
+  my $file = shift;
+  Log::Log4perl->init(shift);
 
-    my $config = new Config::Simple($file);
+  my $config = new Config::Simple($file);
+  my $logger = Log::Log4perl->get_logger("60export");
     
-    my $source = $config->param("result.source");
-    if(not ZBH::Local::is_folder_exists( $source )) {
-      ZBH::Flensburg::fatal( "60export", "Task starter report",
-	"Vector folder does not exists: $source" );
-      return ("wait");
-    } 	    
-    
-    my $destination = $config->param("result.destination");
-    if(not ZBH::Local::is_folder_exists( $destination )) {
-      ZBH::Flensburg::fatal( "60export", "Task starter report",
-	"Vector folder does not exists: $destination" );
-      return ("wait");
-    } 	    
+  my $source = $config->param("60export.source");
+  $logger->info("60export.source", $destination);
+  if(not ZBH::Local::is_folder_exists( $source )) {
+    $logger->fatal( "Task starter report, vector folder does not exists: $source" );
+    return ("error");
+  } 	    
+  
+  my $destination = $config->param("60export.destination");
+  $logger->info("60export.destination", $destination);
+  if(not ZBH::Local::is_folder_exists( $destination )) {
+    $logger->fatal("Task starter report, vector folder does not exists: $destination" );
+    return ("error");
+  } 	    
 
-    my $process = "$FindBin::Bin/start";
-    if ( ZBH::Local::is_background_process( $process ) ) {
-      return ("wait");
-    }
-
-    if(ZBH::Local::is_folder_empty($source)
-      and not ZBH::Local::is_folder_empty($destination)) {
-	return ("done");
-    }
-    
-    if(ZBH::Local::is_folder_exists($source)
-	and not ZBH::Local::is_folder_empty($source)) {
-	  return ("ready");
-    }
-
+  my $process = "$FindBin::Bin/start";
+  if ( ZBH::Local::is_background_process( $process ) ) {
+    $logger->error("Already started: ", $process );
     return ("wait");
+  }
+
+  if(ZBH::Local::is_folder_empty($source)
+    and not ZBH::Local::is_folder_empty($destination)) {
+      $logger->info("Done");
+      return ("done");
+  }
+  
+  if(ZBH::Local::is_folder_exists($source)
+    and not ZBH::Local::is_folder_empty($source)) {
+      $logger->info("Ready");
+      return ("ready");
+  }
+  
+  return ("wait");
 }
-exit( not print( main( "$FindBin::Bin/../../etc/export.cnf", ) ) );
+
+exit( 
+  not print( 
+    main( 
+      "$FindBin::Bin/../../etc/update.conf", 
+      "$FindBin::Bin/../../etc/logging.conf" ,
+    ) 
+  ) 
+);

@@ -22,34 +22,48 @@ use File::Path qw(make_path remove_tree);
 use ZBH::Flensburg;
 use ZBH::Local;
 use File::Basename;
+use Log::Log4perl;
 
 sub main {
-    my $file = shift;
+  my $file = shift;
+  Log::Log4perl->init(shift);
 
-    my $config = new Config::Simple($file);
+  my $config = new Config::Simple($file);
+  my $logger = Log::Log4perl->get_logger("60export");
 
-    my $source = $config->param("result.source");
-    if(not ZBH::Local::is_folder_exists( $source )) {
-      ZBH::Flensburg::fatal( "60export", "Task starter report",
-	"Vector folder does not exists: $source" );
-      return ("wait");
-    } 	    
+  my $source = $config->param("60export.source");
+  if(not ZBH::Local::is_folder_exists( $source )) {
+    $logger->fatal( "Task starter report, vector folder does not exists: $source" );
+    return ("error");
+  } 	    
     
-    my $destination = $config->param("result.destination");
-    if(not ZBH::Local::is_folder_exists( $destination )) {
-      ZBH::Flensburg::fatal( "60export", "Task starter report",
-	"Vector folder does not exists: $destination" );
-      return ("wait");
-    } 	    	
+  my $destination = $config->param("60export.destination");
+  if(not ZBH::Local::is_folder_exists( $destination )) {
+    $logger->fatal("Task starter report, vector folder does not exists: $destination" );
+    return ("error");
+  } 	    	
 	
-    remove_tree("$destination");
-    move( $source, $destination ) or return ("failure");
-    make_path("$source") or return ("failure");
+  $logger->info("Clean folder: $destination" );
+  remove_tree("$destination");
+  
+  $logger->info("Moving files from: $source, to :$destination" );
+  move( $source, $destination ) or return ("error");
+  
+  $logger->info("Create folder: $source" );
+  make_path("$source") or return ("error");
 
-    ZBH::Flensburg::success( "60export", "Data exporter report",
-      "You can find all files here: $destination"
-    );
+  ZBH::Flensburg::success( "60export", "Data exporter report",
+    "You can find all files here: $destination"
+  );
 
-    return ("done");
+  return ("done");
 }
-exit( not print( main( "$FindBin::Bin/../../etc/export.cnf", ) ) );
+
+exit( 
+  not print( 
+    main( 
+      "$FindBin::Bin/../../etc/update.conf", 
+      "$FindBin::Bin/../../etc/logging.conf" ,
+    ) 
+  ) 
+);

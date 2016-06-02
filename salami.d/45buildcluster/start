@@ -16,44 +16,55 @@ use ZBH::SGE;
 use ZBH::Local;
 use Config::Simple;
 use ZBH::Flensburg;
+use Log::Log4perl;
 
 
 sub main {
-    my $file = shift;
+  my $file = shift;
+  Log::Log4perl->init(shift);
 
-    my $config = new Config::Simple($file);
+  my $config = new Config::Simple($file);
+  my $logger = Log::Log4perl->get_logger("45buildcluster");
 
-    my $starter = $config->param("bin.starter");
+    my $starter = $config->param("45buildcluster.starter");
     if ( not ZBH::Local::is_file_exists($starter)) {
-      ZBH::Flensburg::fatal( "45buildcluster",  "Can not start task", 
-	"Executalbe file not found: $starter");
-      return("wait");
+      $logger->fatal( "Can not start task, executalbe file not found: $starter");
+      return("error");
     }	
     
-    my $status  = $config->param("bin.status");
+    my $status = $config->param("45buildcluster.status");
+    $logger->info( "45buildcluster.status", $status);
     if ( not ZBH::Local::is_file_exists($status)) {
-      ZBH::Flensburg::fatal( "45buildcluster",  "Can not start task", 
-	"Executalbe file not found: $status");
-      return("wait");
+      $logger->fatal("Can not start task, executalbe file not found: $status");
+      return("error");
     }	
 		
-    my $sequence_graph = $config->param("sequence.graph");
-    my $sequence_cluster = $config->param("sequence.cluster");    
+    my $sequence_graph = $config->param("45buildcluster.sequence_graph");
+    $logger->info( "45buildcluster.sequence_graph", $sequence_graph);
+    
+    my $sequence_cluster = $config->param("45buildcluster.sequence_cluster");    
+    $logger->info( "45buildcluster.sequence_cluster", $sequence_cluster);
+    
     if ( not ZBH::Local::is_file_exists($sequence_graph)) {
-      ZBH::Flensburg::fatal( "45buildcluster",  "Can not start task", 
-	"Graph file not found: $sequence_graph");
-      return("wait");
+      $logger->fatal("Can not start task, graph file not found: $sequence_graph");
+      return("error");
     }	
 
-    my $structure_graph = $config->param("structure.graph");
-    my $structure_cluster = $config->param("structure.cluster");    
+    my $structure_graph = $config->param("45buildcluster.structure_graph");
+    $logger->info( "45buildcluster.structure_graph", $structure_graph);
+    
+    my $structure_cluster = $config->param("45buildcluster.structure_cluster");    
+    $logger->info( "45buildcluster.structure_cluster", $structure_cluster);
+    
     if ( not ZBH::Local::is_file_exists($structure_graph)) {
-      ZBH::Flensburg::fatal( "45buildcluster",  "Can not start task", 
-	"Graph file not found: $structure_graph");
-      return("wait");
+      $logger->fatal("Can not start task, graph file not found: $structure_graph");
+      return("error");
     }	    
 
+    $logger->info("Start: $starter $sequence_graph $sequence_cluster");
     ZBH::Local::background("$starter $sequence_graph $sequence_cluster");
+    
+    $logger->info("Start: $starter $structure_graph $structure_cluster");
     ZBH::Local::background("$starter $structure_graph $structure_cluster");
 
     ZBH::Flensburg::info("45buildcluster", "Script starter report",
@@ -64,4 +75,11 @@ sub main {
     return ("wait");
 }
 
-exit( not print( main( "$FindBin::Bin/../../etc/cluster.cnf", ) ) );
+exit( 
+  not print( 
+    main( 
+      "$FindBin::Bin/../../etc/update.conf",
+      "$FindBin::Bin/../../etc/logging.conf" ,
+    ) 
+  ) 
+);

@@ -16,46 +16,74 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use ZBH::SGE;
 use ZBH::Local;
-use Config::Simple;
 use ZBH::Flensburg;
 
+use Config::Simple;
+use Log::Log4perl;
+
 sub main {
-	my $file = shift;
+  my $file = shift;
+  Log::Log4perl->init(shift);
 
-	my $config  = new Config::Simple($file);
-	
-	my $result_sequence = $config->param( "result.sequence");
-	my $result_structure = $config->param( "result.structure");	
+  my $config  = new Config::Simple($file);
+  my $logger  = Log::Log4perl->get_logger("25buildimbiss");
+  
+  my $result_sequence = $config->param( "25buildimbiss.sequence");
+  $logger->info( "25buildimbiss.sequence: ", $result_sequence );
+  
+  my $result_structure = $config->param( "25buildimbiss.structure");	
+  $logger->info( "25buildimbiss.structure: ", $result_structure );
 
-	my $process  = "wurstimbiss";
-	if (ZBH::Local::is_background_process($process) 
-	  or ZBH::SGE::is_background_process_sge($process)) {
-	  return("wait");
-	}	
+  my $process  = "wurstimbiss";
+  if (ZBH::Local::is_background_process($process) 
+    or ZBH::SGE::is_background_process_sge($process)) {
+      $logger->error( "Already started: ", $process );
+      return("wait");
+  }	
 	
-	my $sequences = $config->param("requirements.sequences");
-	if ( not ZBH::Local::is_file_exists($sequences)) {
-	  ZBH::Flensburg::fatal( "25buildimbiss",  "Can not start task", 
-	    "Can not find sequence list: $sequences");
-	  return("wait");
-	}
+  my $sequences = $config->param("25buildimbiss.sequences");
+  $logger->info( "25buildimbiss.sequences: ", $sequences );
+  
+  if ( not ZBH::Local::is_file_exists($sequences)) {
+    $logger->fatal( "Can not start task, can not find sequence list: $sequences");
+    return("error");
+  }
 	
-	if (ZBH::Local::is_file_exists($result_sequence) 
-	    and ZBH::Local::is_file_exists($result_structure)) {
-	      my $keystring = "100.000000 %";
-	      my $seqlog = "$FindBin::Bin/../../log/sequence.log";
-	      my $strlog = "$FindBin::Bin/../../log/structure.log";
-	      if(ZBH::SGE::is_background_process_done($seqlog, $keystring) 
-		  and ZBH::SGE::is_background_process_done($strlog, $keystring)) {
-		    unlink($seqlog);
-		    unlink($strlog);
-		    return ("done");
-	      }
-	      return("wait");
-	}	
+  if (ZBH::Local::is_file_exists($result_sequence) 
+    and ZBH::Local::is_file_exists($result_structure)) {
+      $logger->info( "Result sequence found: ", $result_sequence);
+      $logger->info( "Result structure found: ", $result_structure);
+      
+      my $keystring = "100.000000 %";
+      my $seqlog = "$FindBin::Bin/../../log/sequence.log";
+      my $strlog = "$FindBin::Bin/../../log/structure.log";
+      
+      if(ZBH::SGE::is_background_process_done($seqlog, $keystring) 
+	and ZBH::SGE::is_background_process_done($strlog, $keystring)) {
+	  $logger->info( "Remove logfile: ", $seqlog);
+	  $logger->info( "Remove logfile: ", $strlog);
+	  
+	  unlink($seqlog);
+	  unlink($strlog);
+	  
+	  $logger->info( "Done");
+	  return ("done");
+      }
+      
+      $logger->info( "Ready");
+      return("ready");
+  }	
 
-	return ("ready");
+  $logger->info( "Ready");
+  return ("ready");
 }
 
-exit( not print( main( "$FindBin::Bin/../../etc/wurstimbiss.cnf", ) ) );
+exit( 
+  not print( 
+    main( 
+      "$FindBin::Bin/../../etc/update.conf", 
+      "$FindBin::Bin/../../etc/logging.conf" ,
+    ) 
+  ) 
+);
 

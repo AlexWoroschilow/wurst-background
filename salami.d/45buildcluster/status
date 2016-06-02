@@ -16,58 +16,78 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use ZBH::SGE;
 use ZBH::Local;
-use Config::Simple;
 use ZBH::Flensburg;
 
+use Config::Simple;
+use Log::Log4perl;
+
 sub main {
-    my $file = shift;
+  my $file = shift;
+  Log::Log4perl->init(shift);
+  
+  my $config = new Config::Simple($file);
+  my $logger = Log::Log4perl->get_logger("45buildcluster");
 
-    my $config  = new Config::Simple($file);
+  my $starter = $config->param("45buildcluster.starter");
+  $logger->info("45buildcluster.starter: ", $starter);
+  if ( not ZBH::Local::is_file_exists($starter)) {
+    $logger->fatal("Can not start task, executalbe file not found: $starter");
+    return("error");
+  }	
+  
+  my $status  = $config->param("45buildcluster.status");
+  $logger->info("45buildcluster.status: ", $status );
+  if ( not ZBH::Local::is_file_exists($status)) {
+    $logger->fatal("Can not start task, executalbe file not found: $status");
+    return("error");
+  }	
+      
+  my $result = ZBH::Local::execute("$status");
+  $logger->info("$status: ", $result );
+  if ( $result eq "started" ) {
+    $logger->error("Already started: ", $status );
+    return ("wait") ;
+  }	   
+  
+  my $sequence_graph = $config->param("45buildcluster.sequence_graph");
+  $logger->info("45buildcluster.sequence_graph: ", $sequence_graph );
+  if ( not ZBH::Local::is_file_exists($sequence_graph)) {
+    $logger->fatal("Can not start task, graph file not found: $sequence_graph");
+    return("error");
+  }	
 
-    my $starter = $config->param("bin.starter");
-    if ( not ZBH::Local::is_file_exists($starter)) {
-      ZBH::Flensburg::fatal( "45buildcluster",  "Can not start task", 
-	"Executalbe file not found: $starter");
-      return("wait");
-    }	
-    
-    my $status  = $config->param("bin.status");
-    if ( not ZBH::Local::is_file_exists($status)) {
-      ZBH::Flensburg::fatal( "45buildcluster",  "Can not start task", 
-	"Executalbe file not found: $status");
-      return("wait");
-    }	
-	
-    my $result = ZBH::Local::execute("$status");
-    if ( $result eq "started" ) {
-      return ("wait") ;
-    }	   
-    
-    my $sequence_graph = $config->param("sequence.graph");
-    if ( not ZBH::Local::is_file_exists($sequence_graph)) {
-      ZBH::Flensburg::fatal( "45buildcluster",  "Can not start task", 
-	"Graph file not found: $sequence_graph");
-      return("wait");
-    }	
+  my $structure_graph = $config->param("45buildcluster.structure_graph");
+  $logger->info("45buildcluster.structure_graph: ", $structure_graph );
+  if ( not ZBH::Local::is_file_exists($structure_graph)) {  
+    $logger->fatal( "Can not start task, graph file not found: $structure_graph");
+    return("error");
+  }	    
+  
+  my $sequence_cluster = $config->param("45buildcluster.sequence_cluster");
+  $logger->info("45buildcluster.sequence_cluster: ", $sequence_cluster );
+  if ( not ZBH::Local::is_file_exists($structure_graph)) {
+    $logger->info("Structure_graph not found: ", $structure_graph );
+    $logger->info("Ready");
+    return ("ready");
+  }
 
-    my $structure_graph = $config->param("structure.graph");
-    if ( not ZBH::Local::is_file_exists($structure_graph)) {
-      ZBH::Flensburg::fatal( "45buildcluster",  "Can not start task", 
-	"Graph file not found: $structure_graph");
-      return("wait");
-    }	    
-    
-    my $sequence_cluster = $config->param("sequence.cluster");
-    if ( not ZBH::Local::is_file_exists($structure_graph)) {
-      return ("ready");
-    }
+  my $structure_cluster = $config->param("45buildcluster.structure_cluster");
+  $logger->info("45buildcluster.structure_cluster: ", $structure_cluster );
+  if ( not ZBH::Local::is_file_exists($structure_graph)) {
+    $logger->info("Structure_cluster not found: ", $structure_cluster );
+    $logger->info("Ready");
+    return ("ready");
+  }
 
-    my $structure_cluster = $config->param("structure.cluster");
-    if ( not ZBH::Local::is_file_exists($structure_graph)) {
-      return ("ready");
-    }
-
-    return ("done");
+  $logger->info("Done");
+  return ("done");
 }
 
-exit( not print( main( "$FindBin::Bin/../../etc/cluster.cnf", ) ) );
+exit( 
+  not print( 
+    main( 
+      "$FindBin::Bin/../../etc/update.conf",
+      "$FindBin::Bin/../../etc/logging.conf" ,
+    ) 
+  ) 
+);

@@ -50,4 +50,4 @@ maximal_hits=50
 
 # How many matches from suffix array we 
 # want to have 
-maximal_match=10000
+maximal_match=500

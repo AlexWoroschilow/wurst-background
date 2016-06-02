@@ -16,54 +16,71 @@ use ZBH::SGE;
 use ZBH::Local;
 use ZBH::Flensburg;
 use Config::Simple;
+use Log::Log4perl;
 
 sub main {
-	my $file = shift;
-	my $date = time;
 
-	my $config = new Config::Simple($file);
-	
-	my $result_sequence = $config->param( "result.sequence");
-	my $result_structure = $config->param( "result.structure");
+  my $config = new Config::Simple(shift);
+  Log::Log4perl->init(shift);
+  my $date = time;
+  
+  my $logger  = Log::Log4perl->get_logger("25buildimbiss");
 
-	if (ZBH::Local::is_file_exists($result_sequence)) {
-	  unlink($result_sequence);
-	}
-	
-	if (ZBH::Local::is_file_exists($result_structure)) {
-	  unlink($result_structure);
-	}
-	
-	my $config_sequence = "$FindBin::Bin/etc/sequence.cnf";
-	if (not ZBH::Local::is_file_exists($config_sequence)) {
-	  ZBH::Flensburg::fatal( "25buildimbiss",  "Can not start task", 
-	    "Can not find config file: $config_sequence");
-	  return ("wait");
-	}
+  my $result_sequence = $config->param( "25buildimbiss.sequence");
+  $logger->info("25buildimbiss.sequence: ", $result_sequence);
+  
+  my $result_structure = $config->param( "25buildimbiss.structure");
+  $logger->info("25buildimbiss.structure: ", $result_structure);
 
-	my $config_structure = "$FindBin::Bin/etc/structure.cnf";
-	if (not ZBH::Local::is_file_exists($config_structure)) {
-	  ZBH::Flensburg::fatal( "25buildimbiss",  "Can not start task", 
-	    "Can not find config file: $config_structure");
-	  return ("wait");
-	}
+  if (ZBH::Local::is_file_exists($result_sequence)) {
+    $logger->info("Remove file: ", $result_sequence);
+    unlink($result_sequence);
+  }
+  
+  if (ZBH::Local::is_file_exists($result_structure)) {
+    $logger->info("Remove file: ", $result_structure);
+    unlink($result_structure);
+  }
+  
+  my $config_sequence = "$FindBin::Bin/etc/sequence.cnf";
+  $logger->info("Config_sequence: ", $config_sequence);
+  if (not ZBH::Local::is_file_exists($config_sequence)) {
+    $logger->fatal("Can not start task, can not find config file: $config_sequence");
+    return ("error");
+  }
 
-	my $starter = "$FindBin::Bin/wurstimbiss.sh";
-	if (not ZBH::Local::is_file_exists($starter)) {
-	  ZBH::Flensburg::fatal( "25buildimbiss",  "Can not start task", 
-	    "Can not find config file: $starter");
-	  return ("wait");
-	}
+  my $config_structure = "$FindBin::Bin/etc/structure.cnf";
+  $logger->info("Config_structure: ", $config_structure);
+  if (not ZBH::Local::is_file_exists($config_structure)) {
+    $logger->fatal("Can not start task, can not find config file: $config_structure");
+    return ("error");
+  }
 
- 	system("qsub -S /bin/bash -wd $FindBin::Bin $starter $config_sequence $result_sequence");
- 	system("qsub -S /bin/bash -wd $FindBin::Bin $starter $config_structure $result_structure");
+  my $starter = "$FindBin::Bin/wurstimbiss.sh";
+  if (not ZBH::Local::is_file_exists($starter)) {
+    $logger->fatal("Can not start task, can not find config file: $starter");
+    return ("error");
+  }
 
-	ZBH::Flensburg::info( "25buildimbiss", "Task starter report",
-	  "Started: $starter $config_sequence $result_sequence\n".
-	  "Started: $starter $config_structure $result_structure\n"
-	);
+  $logger->info("Start: ", $starter $config_sequence $result_sequence);
+  system("qsub -S /bin/bash -wd $FindBin::Bin $starter $config_sequence $result_sequence");
+  
+  $logger->info("Start: ", $starter $config_structure $result_structure);
+  system("qsub -S /bin/bash -wd $FindBin::Bin $starter $config_structure $result_structure");
 
-	return ("wait");
+  ZBH::Flensburg::info( "25buildimbiss", "Task starter report",
+    "Started: $starter $config_sequence $result_sequence\n".
+    "Started: $starter $config_structure $result_structure\n"
+  );
+
+  return ("wait");
 }
 
-exit( not print( main( "$FindBin::Bin/../../etc/wurstimbiss.cnf", ) ) );
+exit( 
+  not print( 
+    main( 
+      "$FindBin::Bin/../../etc/update.conf", 
+      "$FindBin::Bin/../../etc/logging.conf" ,
+    ) 
+  ) 
+);

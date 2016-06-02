@@ -31,19 +31,11 @@ use Gearman::Killer::Worker;
 use Config::Simple;
 use Sys::Hostname;
 
-my $logfile;
-sub set_logfile($) {
-	$logfile = shift;
-}
-sub get_logfile() {
-	return $logfile if defined($logfile);
-}
 
 sub main ($) {
 	my $opt = shift;
 
 	my $cfg = new Config::Simple( $opt->get_config );
-	set_logfile($cfg->param("worker.logfile"));
 
 	my $port     = $cfg->param("worker.port");
 	my $host     = $cfg->param("worker.host");

@@ -14,24 +14,37 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib/perl";
 use ZBH::SGE;
 use ZBH::Local;
-use Config::Simple;
 use ZBH::Flensburg;
 
+use Config::Simple;
+use Log::Log4perl;
 
 sub main {
     my $file = shift;
-    my $logging  = shift;    
-    my $server  = shift;
-    my $planner = shift;
-    my $worker  = shift;
+    my $logging = shift;
 
-    my $config = new Config::Simple($file);
+    my $server = shift;
+    my $planner = shift;
+    my $worker = shift;
+    
+    Log::Log4perl->init($logging);    
+    my $logger = Log::Log4perl->get_logger("10buildvec");
+
+    $logger->info("Server: ", $server );
+    $logger->info("Planner: ", $planner );
+    $logger->info("Worker: ", $worker );
+    $logger->info("Logging: ", $logging );
+    
+    my $config = new Config::Simple($file);    
     $config->param( "settings.lastrun", time );
     $config->write($file);
+    
+    $logger->info("settings.lastrun: ", $config->param( "settings.lastrun"));    
 
     if ( ZBH::SGE::is_background_process_sge($server)
       || ZBH::SGE::is_background_process_sge($planner)
       || ZBH::SGE::is_background_process_sge($worker) ) {
+	$logger->error("Already started");
 	return ("wait");
     }    
 
@@ -58,22 +71,19 @@ sub main {
 
     my $output_vec_tau_all = $config->param("planner.output_vec_tau_all");
     make_path( $output_vec_tau_all ) if ( not ZBH::Local::is_folder_exists ($output_vec_tau_all));
-
-    my $serverlog  = $config->param("server.logfile");
-    unlink($serverlog) if(ZBH::Local::is_file_exists($serverlog));
     
-    my $workerlog  = $config->param("worker.logfile");    
-    unlink($workerlog) if(ZBH::Local::is_file_exists($workerlog));
-    
-    my $plannerlog = $config->param("planner.logfile");
-    unlink($plannerlog) if(ZBH::Local::is_file_exists($plannerlog));    
-    
+    $logger->info("Start: ", $server );
     ZBH::Local::background("qsub -S /bin/bash -wd $FindBin::Bin $server $file $logging");
     while ( not ZBH::SGE::is_background_process_started_sge($server) ) {
+      $logger->info("SGE process not found: ", $server );    
       sleep(1);    
     }
+    $logger->info("SGE process found: ", $server );
 
+    $logger->info("Start: ", $worker );
     ZBH::Local::background("qsub -S /bin/bash -wd $FindBin::Bin $worker $file $logging");
+    
+    $logger->info("Start: ", $planner );
     ZBH::Local::background("qsub -S /bin/bash -wd $FindBin::Bin $planner $file $logging");
     
     ZBH::Flensburg::info("10buildvec", "Task starter report",
@@ -85,12 +95,12 @@ sub main {
 
 exit( 
   not print( 
-      main(
-	"$FindBin::Bin/../../etc/vector.cnf",
-	"$FindBin::Bin/etc/logging.cnf",
-	"$FindBin::Bin/bin/server.sh",   
-	"$FindBin::Bin/bin/planner.sh",
-	"$FindBin::Bin/bin/worker.sh"
+      main( 
+	"$FindBin::Bin/../../etc/vector.cnf", 
+	"$FindBin::Bin/../../etc/logging.conf",
+	"$FindBin::Bin/bin/server.sh", 
+	"$FindBin::Bin/bin/planner.sh", 
+	"$FindBin::Bin/bin/worker.sh",
       ) 
   ) 
 );

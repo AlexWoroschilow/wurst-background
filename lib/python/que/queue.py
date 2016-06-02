@@ -97,7 +97,7 @@ class TaskRunner(object):
 
     @property
     def is_failure(self):
-        return self.status.find('failure') != -1
+        return self.status.find('error') != -1
 
     def _start(self, script):
         with subprocess.Popen([script], stdout=subprocess.PIPE) as process:

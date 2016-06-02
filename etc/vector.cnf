@@ -1,48 +1,43 @@
 ; Config::Simple 4.59
-; Thu May 19 16:20:37 2016
+; Thu Jun  2 19:18:31 2016
 
 [server]
-wakeup=3
-accept=10
 port=7003
-logfile=/home/other/wurst/wurst-background/salami.d/10buildvec/../../log/server.log
+accept=10
+waiting_for_work=220
 delay=0
+wakeup=3
 waiting_for_client=500
 gracefully=0
-waiting_for_work=220
+
+[settings]
+lastrun=1464887342
+interval=604800
 
 [planner]
-outlist_all=
-outlist_lib=/work/public/no_backup/bm/pdb_lib.list
-source=/work/public/no_backup/pdb/data/structures/divided/pdb
-class_vec1=/work/public/no_backup/bm/classfile
-class_vec2=/work/public/no_backup/bm/F7_ca_mod
-library=/work/public/no_backup/bm/pdb_lib.list
-output_vec_7=/work/public/no_backup/bm/pdb90_vec_7mer_ca_mod
-output_vec_6_all=/work/public/no_backup/bm/pdb_all_6mer_struct
-reconnect_attempts=100
-output_vec1=/work/public/no_backup/bm/pdb90_vec_6mer_struct_test
-reconnect_timeout=1
-logfile=/home/other/wurst/wurst-background/salami.d/10buildvec/../../log/planner.log
-host=weissensee
-output_vec_tau_all=/work/public/no_backup/bm/pdb_all_7tau_struct
 output_vec_7_all=/work/public/no_backup/bm/pdb_all_7mer_ca_mod
-cluster=/work/public/no_backup/pdb/derived_data/NR/clusters90.txt
-temp=/work/public/no_backup/bm/update/TEMP
+outlist_lib=/work/public/no_backup/bm/pdb_lib.list
+output_vec_6_all=/work/public/no_backup/bm/pdb_all_6mer_struct
+library=/work/public/no_backup/bm/pdb_lib.list
 output_vec_6=/work/public/no_backup/bm/pdb90_vec_6mer_struct
-output_bin=/work/public/no_backup/bm/pdb_all_bin
-port=7003
 output_vec_tau=/work/public/no_backup/bm/pdb90_vec_7tau_struct
+reconnect_attempts=100
+cluster=/work/public/no_backup/pdb/derived_data/NR/clusters90.txt
+host=eibsee
+output_vec_7=/work/public/no_backup/bm/pdb90_vec_7mer_ca_mod
+reconnect_timeout=1
+temp=/work/public/no_backup/bm/update/TEMP
+source=/work/public/no_backup/pdb/data/structures/divided/pdb
+class_vec_7=/work/public/no_backup/bm/F7_ca_mod
+port=7003
+class_vec_6=/work/public/no_backup/bm/classfile
+output_bin=/work/public/no_backup/bm/pdb_all_bin
+output_vec_tau_all=/work/public/no_backup/bm/pdb_all_7tau_struct
 
 [worker]
 waiting_for_server=500
-waiting_for_work=220
-logfile=/home/other/wurst/wurst-background/salami.d/10buildvec/../../log/worker.log
 port=7003
-host=weissensee
-
-[settings]
-interval=604800
-lastrun=1463667629
+host=eibsee
+waiting_for_work=220
 
 
