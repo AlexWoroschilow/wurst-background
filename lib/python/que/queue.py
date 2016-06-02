@@ -11,19 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os 
 import re
-import glob
 import sys
-import subprocess
+import glob
 import logging
-
+import subprocess
 from time import sleep
 
 class Task(object):
+    _path = None
+    
     def __init__(self, path):
-        self._logger = logging.getLogger('task')
-        self._logger.debug(path)        
         self._path = path
-        pass
+        logger = logging.getLogger('task') 
+        logger.debug(path)        
 
     @property
     def priority(self):
@@ -38,11 +38,11 @@ class Task(object):
 
     @property
     def start(self):
-        return "%s/start" % self._path
+        return "%s/start" % self.path
 
     @property
     def status(self):
-        return "%s/status" % self._path
+        return "%s/status" % self.path
 
     @property
     def name(self):
@@ -68,10 +68,12 @@ class Task(object):
 
 
 class TaskRunner(object):
+    _status = None
+    _task = None
+    
     def __init__(self, task):
         self._logger = logging.getLogger('task-runner')
         self._logger.debug(task.name)        
-        self._status = None
         self._task = task
         pass
 
@@ -96,7 +98,7 @@ class TaskRunner(object):
         return self.status.find('wait') != -1
 
     @property
-    def is_failure(self):
+    def is_error(self):
         return self.status.find('error') != -1
 
     def _start(self, script):
@@ -110,16 +112,19 @@ class TaskRunner(object):
     
     def start(self):
         for script in [self._task.status, self._task.start]:
-            if not self._start(script):
-                return False            
-            if self.is_done:
-                return True
-            if self.is_failure or self.is_wait:
-                return False
+            if self._start(script):
+                if self.is_error or self.is_wait:
+                    return False
+                if self.is_done:
+                    return True
+            return False
         return True
 
 
 class Queue(object):
+    _logger = None
+    _path = None
+    
     def __init__(self, path):
         self._path = path        
         self._logger = logging.getLogger('queue')
@@ -150,7 +155,6 @@ class Queue(object):
             self._logger.info("%s - %s" % (task.name, process.status))
             if not status :
                 break
-
             
     def start_task(self, name=None):
         for task in self.tasks:
