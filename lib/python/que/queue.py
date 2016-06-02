@@ -64,18 +64,18 @@ class Task(object):
         return self.priority <= other.priority     
     
     def __str__(self):
-            return self.name
+        return self.name
 
 
 class TaskRunner(object):
+    _logger = None
     _status = None
     _task = None
     
     def __init__(self, task):
+        self._task = task
         self._logger = logging.getLogger('task-runner')
         self._logger.debug(task.name)        
-        self._task = task
-        pass
 
     @property
     def status(self):
@@ -129,7 +129,6 @@ class Queue(object):
         self._path = path        
         self._logger = logging.getLogger('queue')
         self._logger.debug("folder with tasks: %s" % path)
-        pass
 
     @property
     def tasks(self):
@@ -138,16 +137,16 @@ class Queue(object):
 
     def queue(self):
         collection = [task for task in self.tasks]
-        collection.sort(reverse=False)
+        collection.sort(reverse = False)
         for task in collection:
             print(task)
             
-    def start(self, name=None):
+    def start(self, name = None):
         if name is not None:
             return self.start_task(name)
 
         collection = [task for task in self.tasks]
-        collection.sort(reverse=False)
+        collection.sort(reverse = False)
         for task in collection:
             self._logger.debug("%s - start" % task.name)
             process = TaskRunner(task)
@@ -156,7 +155,7 @@ class Queue(object):
             if not status :
                 break
             
-    def start_task(self, name=None):
+    def start_task(self, name = None):
         for task in self.tasks:
             if task.name == name:
                 self._logger.info(name)
