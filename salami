@@ -31,6 +31,5 @@ if __name__ == "__main__":
     logging.basicConfig(level=options.loglevel, format=options.format)        
 
     queue = Queue("%s/salami.d/*" % os.getcwd())
-    queue.queue() \
-        if options.queue \
+    queue.queue() if options.queue \
         else queue.start(options.task)
