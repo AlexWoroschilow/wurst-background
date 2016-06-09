@@ -21,9 +21,20 @@ use ZBH::Flensburg;
 use Config::Simple;
 use Log::Log4perl;
 
+
+sub fatal($ $) {
+  my $logger = shift;
+  my $message = shift;
+  
+  $logger->fatal($message);
+  ZBH::Flensburg::fatal("25buildimbiss", "Can not start task", $message);  
+}
+
 sub main {
   my $file = shift;
   Log::Log4perl->init(shift);
+  my $config_structure = shift;  
+  my $config_sequence = shift;
 
   my $config  = new Config::Simple($file);
   my $logger  = Log::Log4perl->get_logger("25buildimbiss");
@@ -39,13 +50,25 @@ sub main {
     or ZBH::SGE::is_background_process_sge($process)) {
       $logger->error( "Already started: ", $process );
       return("wait");
-  }	
-	
+  }	  
+  
   my $sequences = $config->param("25buildimbiss.sequences");
   $logger->info( "25buildimbiss.sequences: ", $sequences );
   
+  $logger->info( "Config_structure: ", $config_structure );
+  if ( not ZBH::Local::is_file_exists($config_structure)) {
+    fatal($logger, "Can not find config file: $config_structure");
+    return("error");
+  }
+
+  $logger->info( "Config_sequence: ", $config_sequence );
+  if ( not ZBH::Local::is_file_exists($config_sequence)) {
+    fatal($logger, "Can not find config file: $config_sequence");
+    return("error");
+  }
+  
   if ( not ZBH::Local::is_file_exists($sequences)) {
-    $logger->fatal( "Can not start task, can not find sequence list: $sequences");
+    fatal($logger, "Can not start task, can not find sequence list: $sequences");
     return("error");
   }
 	
@@ -83,6 +106,8 @@ exit(
     main( 
       "$FindBin::Bin/../../etc/update.conf", 
       "$FindBin::Bin/../../etc/logging.conf" ,
+      "$FindBin::Bin/../../etc/25buildimbiss.str.conf",
+      "$FindBin::Bin/../../etc/25buildimbiss.seq.conf",      
     ) 
   ) 
 );

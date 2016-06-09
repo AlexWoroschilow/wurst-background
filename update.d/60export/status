@@ -21,6 +21,14 @@ use ZBH::Flensburg;
 use Config::Simple;
 use Log::Log4perl;
 
+sub fatal($ $) {
+  my $logger = shift;
+  my $message = shift;
+  
+  $logger->fatal($message);
+  ZBH::Flensburg::fatal("60export", "Can not start task", $message);  
+}
+
 sub main {
   my $file = shift;
   Log::Log4perl->init(shift);
@@ -31,14 +39,14 @@ sub main {
   my $source = $config->param("60export.source");
   $logger->info("60export.source", $destination);
   if(not ZBH::Local::is_folder_exists( $source )) {
-    $logger->fatal( "Task starter report, vector folder does not exists: $source" );
+    fatal($logger, "Task starter report, vector folder does not exists: $source" );
     return ("error");
   } 	    
   
   my $destination = $config->param("60export.destination");
   $logger->info("60export.destination", $destination);
   if(not ZBH::Local::is_folder_exists( $destination )) {
-    $logger->fatal("Task starter report, vector folder does not exists: $destination" );
+    fatal($logger, "Task starter report, vector folder does not exists: $destination" );
     return ("error");
   } 	    
 

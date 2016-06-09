@@ -96,7 +96,7 @@ sub main {
 exit( 
   not print( 
       main( 
-	"$FindBin::Bin/../../etc/vector.cnf", 
+	"$FindBin::Bin/../../etc/10buildvec.conf", 
 	"$FindBin::Bin/../../etc/logging.conf",
 	"$FindBin::Bin/bin/server.sh", 
 	"$FindBin::Bin/bin/planner.sh", 

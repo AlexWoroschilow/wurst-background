@@ -19,8 +19,11 @@ import logging
 from time import sleep
 
 class Task(object):
-    def __init__(self, path):
-        self._logger = logging.getLogger('task')
+    _logger = None
+    _path = None
+  
+    def __init__(self, logger, path):
+        self._logger = logger
         self._logger.debug(path)        
         self._path = path
         pass
@@ -68,8 +71,12 @@ class Task(object):
 
 
 class TaskRunner(object):
-    def __init__(self, task):
-        self._logger = logging.getLogger('task-runner')
+    _logger = None
+    _status = None
+    _task = None
+
+    def __init__(self, logger, task):
+        self._logger = logger
         self._logger.debug(task.name)        
         self._status = None
         self._task = task
@@ -120,16 +127,19 @@ class TaskRunner(object):
 
 
 class Queue(object):
-    def __init__(self, path):
+    _path = None
+    _logger = None
+  
+    def __init__(self, logger, path):
         self._path = path        
-        self._logger = logging.getLogger('queue')
+        self._logger = logger
         self._logger.debug("folder with tasks: %s" % path)
         pass
 
     @property
     def tasks(self):
         for task in glob.glob(self._path):
-            yield Task(task)
+            yield Task(self._logger, task)
 
     def queue(self):
         collection = [task for task in self.tasks]
@@ -145,7 +155,7 @@ class Queue(object):
         collection.sort(reverse=False)
         for task in collection:
             self._logger.debug("%s - start" % task.name)
-            process = TaskRunner(task)
+            process = TaskRunner(self._logger, task)
             status = process.start()
             self._logger.info("%s - %s" % (task.name, process.status))
             if not status :
@@ -156,6 +166,6 @@ class Queue(object):
         for task in self.tasks:
             if task.name == name:
                 self._logger.info(name)
-                process = TaskRunner(task)
+                process = TaskRunner(self._logger, task)
                 return process.start()
 

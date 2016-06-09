@@ -13,9 +13,13 @@
 import os 
 import sys
 import logging
+from logging.handlers import RotatingFileHandler
+
 from optparse import OptionParser
 
-sys.path.append("%s/lib/python" % os.getcwd())
+root = os.path.dirname(os.path.realpath(__file__))
+
+sys.path.append("%s/lib/python" % root)
 
 from que.queue import Queue
 
@@ -24,13 +28,19 @@ if __name__ == "__main__":
     parser.add_option("-q", "--queue", action="store_true", default=False, dest="queue", help="show tasks")
     parser.add_option("-t", "--task", default=None, dest="task", help="run task by name")
     parser.add_option("-l", "--loglevel", default=logging.INFO, dest="loglevel", help="logging level")
-    parser.add_option("-f", "--format", default="%(asctime)s\t- %(levelname)s\t- %(name)s - %(message)s", dest="format", help="format for log string")
+    parser.add_option("-f", "--logfile", default=("%s/log/update.log" % root), dest="logfile", help="file to store log records")
 
     (options, args) = parser.parse_args()
 
-    logging.basicConfig(level=options.loglevel, format=options.format)        
+    format = '[%(relativeCreated)d][%(name)s] %(levelname)s - %(message)s'
+    logging.basicConfig( level=options.loglevel, format=format)
 
-    queue = Queue("%s/salami.d/*" % os.getcwd())
-    queue.queue() \
-        if options.queue \
+    handler = RotatingFileHandler(filename=options.logfile, maxBytes=(1024 * 100), backupCount=3)
+    handler.setFormatter(logging.Formatter(format))
+
+    logger = logging.getLogger('queue')
+    logger.addHandler(handler)      
+      
+    queue = Queue(logger, "%s/update.d/*" % root)
+    queue.queue() if options.queue \
         else queue.start(options.task)

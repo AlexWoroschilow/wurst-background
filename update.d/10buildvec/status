@@ -30,6 +30,15 @@ use vars qw ( $TMPDIR $INPUT_CLST_LIST $OUTPUT_BIN_DIR $OUTPUT_LIB_LIST );
 use vars qw ( $OUTPUT_VEC6_DIR $OUTPUT_VEC7_DIR $OUTPUT_VEC_TAU_DIR $OUTPUT_VEC_TAU_ALL );
 use vars qw ( $OUTPUT_VEC6_DIR $OUTPUT_VEC7_DIR );
 
+
+sub fatal($ $) {
+  my $logger = shift;
+  my $message = shift;
+  
+  $logger->fatal($message);
+  ZBH::Flensburg::fatal("10buildvec", "Can not start task", $message);  
+}
+
 sub main {
     my $file_config = shift;
     my $logfile = shift;
@@ -65,91 +74,91 @@ sub main {
     my $cluster = $config->param("planner.cluster");    
     $logger->info("planner.cluster: ", $cluster);
     if ( not ZBH::Local::is_file_exists($cluster)) {
-      $logger->fatal("Can not start task, file not found: $cluster");
+      fatal($logger, "Can not start task, file not found: $cluster");
       return("error");
     }    
     
     my $class_vec6 = $config->param("planner.class_vec_6");    
     $logger->info("planner.class_vec_6: ", $class_vec6);
     if ( not ZBH::Local::is_file_exists($class_vec6)) {
-      $logger->fatal("Can not start task, file not found: $class_vec6");
+      fatal($logger, "Can not start task, file not found: $class_vec6");
       return("error");
     }	
 
     my $class_vec7 = $config->param("planner.class_vec_7");    
     $logger->info("planner.class_vec_7: ", $class_vec7);
     if ( not ZBH::Local::is_file_exists($class_vec7)) {
-      $logger->fatal( "Can not start task File not found: $class_vec7");
+      fatal($logger, "Can not start task File not found: $class_vec7");
       return("error");
     }
 
     my $temp = $config->param("planner.temp");
     $logger->info("planner.temp: ", $temp);
     if ( not length($temp)) {
-      $logger->fatal("Can not start task, folder name lenght can not be empty (temp)");
+      fatal($logger, "Can not start task, folder name lenght can not be empty (temp)");
       return("error");
     }	
 
     my $source = $config->param("planner.source");
     $logger->info("planner.source: ", $source);
     if ( not length($source)) {
-      $logger->fatal("Can not start task, folder name lenght can not be empty (source)");
+      fatal($logger, "Can not start task, folder name lenght can not be empty (source)");
       return("error");
     }	
     
     my $output_bin = $config->param("planner.output_bin");
     $logger->info("planner.output_bin: ", $output_bin);
     if ( not length($output_bin)) {
-      $logger->fatal("Can not start task, folder name lenght can not be empty (output_bin)");
+      fatal($logger, "Can not start task, folder name lenght can not be empty (output_bin)");
       return("error");
     }	
     
     my $output_vec_6  = $config->param("planner.output_vec_6");
     $logger->info("planner.output_vec_6: ", $output_vec_6);
     if ( not length($output_vec_6)) {
-      $logger->fatal("Can not start task, folder name lenght can not be empty (output_vec_6)");
+      fatal($logger, "Can not start task, folder name lenght can not be empty (output_vec_6)");
       return("error");
     }	
 
     my $output_vec_6_all = $config->param("planner.output_vec_6_all");
     $logger->info("planner.output_vec_6_all: ", $output_vec_6_all);
     if ( not length($output_vec_6_all)) {
-      $logger->fatal("Can not start task, folder name lenght can not be empty (output_vec_6_all)");
+      fatal($logger, "Can not start task, folder name lenght can not be empty (output_vec_6_all)");
       return("error");
     }	    
 
     my $output_vec_7 = $config->param("planner.output_vec_7");
     $logger->info("planner.output_vec_7: ", $output_vec_7);    
     if ( not length($output_vec_7)) {
-      $logger->fatal("Can not start task, folder name lenght can not be empty (output_vec_7)");
+      fatal($logger, "Can not start task, folder name lenght can not be empty (output_vec_7)");
       return("error");
     }	    
     
     my $output_vec_7_all = $config->param("planner.output_vec_7_all");
     $logger->info("planner.output_vec_7_all: ", $output_vec_7_all);
     if ( not length($output_vec_7_all)) {
-      $logger->fatal("Can not start task, folder name lenght can not be empty (output_vec_7_all)");
+      fatal($logger, "Can not start task, folder name lenght can not be empty (output_vec_7_all)");
       return("error");
     }	    
 
     my $output_vec_tau = $config->param("planner.output_vec_tau");
     $logger->info("planner.output_vec_tau: ", $output_vec_tau);
     if ( not length($output_vec_tau)) {
-      $logger->fatal("Can not start task, folder name lenght can not be empty (output_vec_tau)");
+      fatal($logger, "Can not start task, folder name lenght can not be empty (output_vec_tau)");
       return("error");
     }	    
 
     my $output_vec_tau_all = $config->param("planner.output_vec_tau_all");
     $logger->info("planner.output_vec_tau_all: ", $output_vec_tau_all);
     if ( not length($output_vec_tau_all)) {
-      $logger->fatal( "Can not start task, folder name lenght can not be empty (output_vec_tau_all)");
+      fatal($logger, "Can not start task, folder name lenght can not be empty (output_vec_tau_all)");
       return("error");
     }	    
     
     my $outlist_lib = $config->param("planner.outlist_lib");
     $logger->info("planner.outlist_lib: ", $outlist_lib);
     if ( not length($outlist_lib)) {
-      $logger->fatal("Can not start task, folder name lenght can not be empty (outlist_lib)");
+      fatal($logger, "Can not start task, folder name lenght can not be empty (outlist_lib)");
       return("error");
     }	    
     
@@ -178,7 +187,7 @@ sub main {
 exit( 
   not print( 
       main( 
-	"$FindBin::Bin/../../etc/vector.cnf", 
+	"$FindBin::Bin/../../etc/10buildvec.conf", 
 	"$FindBin::Bin/../../etc/logging.conf",
 	"$FindBin::Bin/bin/server.sh", 
 	"$FindBin::Bin/bin/planner.sh", 

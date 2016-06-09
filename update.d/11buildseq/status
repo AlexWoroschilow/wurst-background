@@ -20,6 +20,14 @@ use Config::Simple;
 use ZBH::Flensburg;
 use Log::Log4perl;
 
+sub fatal($ $) {
+  my $logger = shift;
+  my $message = shift;
+  
+  $logger->fatal($message);
+  ZBH::Flensburg::fatal("11buildseq", "Can not start task", $message);  
+}
+
 sub main {
     my $file = shift;
     Log::Log4perl->init(shift);
@@ -30,7 +38,7 @@ sub main {
     my $alphabet = $config->param("11buildseq.alphabet");
     $logger->info( "11buildseq.alphabet: ", $alphabet );    
     if(not ZBH::Local::is_file_exists( $alphabet)) {    
-      $logger->fatal( "Task starter report, can not find alphabet file: $alphabet" );
+      fatal($logger, "Task starter report, can not find alphabet file: $alphabet" );
       return ("error");
     }
     
