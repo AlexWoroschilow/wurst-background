@@ -11,11 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os 
 import re
-import glob
 import sys
-import subprocess
+import glob
 import logging
-
+import subprocess
 from time import sleep
 
 class Task(object):
@@ -23,10 +22,9 @@ class Task(object):
     _path = None
   
     def __init__(self, logger, path):
+        self._path = path
         self._logger = logger
         self._logger.debug(path)        
-        self._path = path
-        pass
 
     @property
     def priority(self):
@@ -41,33 +39,33 @@ class Task(object):
 
     @property
     def start(self):
-        return "%s/start" % self._path
+        return "%s/start" % self.path
 
     @property
     def status(self):
-        return "%s/status" % self._path
+        return "%s/status" % self.path
 
     @property
     def name(self):
         return self.path[self.path.rfind('/') + 1:]
     
     def __eq__(self, other):
-        return not self.priority < other.priority and not other.priority < self.priority
+        return self.priority == other.priority
 
     def __ne__(self, other):
-        return self.priority < other.priority or other.priority < self.priority
+        return self.priority != other.priority
 
     def __gt__(self, other):
-        return other.priority < self.priority
+        return self.priority > other.priority 
 
     def __ge__(self, other):
-        return not self.priority < other.priority
+        return self.priority >= other.priority
 
     def __le__(self, other):
-        return not other.priority < self.priority    
+        return self.priority <= other.priority     
     
     def __str__(self):
-            return self.name
+        return self.name
 
 
 class TaskRunner(object):
@@ -76,11 +74,9 @@ class TaskRunner(object):
     _task = None
 
     def __init__(self, logger, task):
+        self._task = task
         self._logger = logger
         self._logger.debug(task.name)        
-        self._status = None
-        self._task = task
-        pass
 
     @property
     def status(self):
@@ -103,7 +99,7 @@ class TaskRunner(object):
         return self.status.find('wait') != -1
 
     @property
-    def is_failure(self):
+    def is_error(self):
         return self.status.find('error') != -1
 
     def _start(self, script):
@@ -117,12 +113,12 @@ class TaskRunner(object):
     
     def start(self):
         for script in [self._task.status, self._task.start]:
-            if not self._start(script):
-                return False            
-            if self.is_done:
-                return True
-            if self.is_failure or self.is_wait:
-                return False
+            if self._start(script):
+                if self.is_error or self.is_wait:
+                    return False
+                if self.is_done:
+                    return True
+            return False
         return True
 
 
@@ -134,7 +130,6 @@ class Queue(object):
         self._path = path        
         self._logger = logger
         self._logger.debug("folder with tasks: %s" % path)
-        pass
 
     @property
     def tasks(self):
@@ -143,16 +138,16 @@ class Queue(object):
 
     def queue(self):
         collection = [task for task in self.tasks]
-        collection.sort(reverse=False)
+        collection.sort(reverse = False)
         for task in collection:
             print(task)
             
-    def start(self, name=None):
+    def start(self, name = None):
         if name is not None:
             return self.start_task(name)
 
         collection = [task for task in self.tasks]
-        collection.sort(reverse=False)
+        collection.sort(reverse = False)
         for task in collection:
             self._logger.debug("%s - start" % task.name)
             process = TaskRunner(self._logger, task)
@@ -160,9 +155,8 @@ class Queue(object):
             self._logger.info("%s - %s" % (task.name, process.status))
             if not status :
                 break
-
             
-    def start_task(self, name=None):
+    def start_task(self, name = None):
         for task in self.tasks:
             if task.name == name:
                 self._logger.info(name)
