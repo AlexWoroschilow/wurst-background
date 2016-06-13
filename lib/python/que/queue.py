@@ -114,6 +114,8 @@ class TaskRunner(object):
     def start(self):
         for script in [self._task.status, self._task.start]:
             if self._start(script):
+                if self.is_ready:
+                    continue
                 if self.is_error or self.is_wait:
                     return False
                 if self.is_done:
