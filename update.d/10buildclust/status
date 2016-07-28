@@ -1,0 +1,88 @@
+#!/usr/bin/perl
+# Copyright 2015 Alex Woroschilow (alex.woroschilow@gmail.com)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+use FindBin;
+use lib "$FindBin::Bin/../../lib/perl";
+use ZBH::SGE;
+use ZBH::Local;
+use ZBH::Flensburg;
+
+use Config::Simple;
+use Log::Log4perl;
+
+sub main {
+	my $file    = shift;
+	my $logging = shift;
+
+	my $server  = shift;
+	my $planner = shift;
+	my $worker  = shift;
+
+	Log::Log4perl->init($logging);
+	my $logger = Log::Log4perl->get_logger("10buildclust");
+
+	my $config = new Config::Simple($file);
+
+	my $cath_source = $config->param("cath.source");
+	$logger->info( "cath.source: ", $cath_source );
+	my $cath_output = $config->param("cath.output");
+	$logger->info( "cath.output: ", $cath_output );
+	if ( not ZBH::Local::is_file_exists($cath_source) ) {
+		$logger->fatal("Source file not found: $cath_source");
+		return ("error");
+	}
+
+	my $scop_source = $config->param("scop.source");
+	$logger->info( "scop.source: ", $scop_source );
+	my $scop_output = $config->param("scop.output");
+	$logger->info( "scop.output: ", $scop_output );
+	if ( not ZBH::Local::is_file_exists($scop_source) ) {
+		$logger->fatal("Source file not found: $scop_source");
+		return ("error");
+	}
+
+	my $pdb50_source = $config->param("pdb50.source");
+	$logger->info( "pdb50.source: ", $pdb50_source );
+	my $pdb50_output = $config->param("pdb50.output");
+	$logger->info( "pdb50.output: ", $pdb50_output );
+	if ( not ZBH::Local::is_file_exists($pdb50_source) ) {
+		$logger->fatal("Source file not found: $pdb50_source");
+		return ("error");
+	}
+
+	my $pdb90_source = $config->param("pdb90.source");
+	$logger->info( "pdb90.source: ", $pdb90_source );
+	my $pdb90_output = $config->param("pdb90.output");
+	$logger->info( "pdb90.output: ", $pdb90_output );
+	if ( not ZBH::Local::is_file_exists($pdb90_source) ) {
+		$logger->fatal("Source file not found: $pdb90_source");
+		return ("error");
+	}
+
+	if (    ZBH::Local::is_file_exists($cath_output)
+		and ZBH::Local::is_file_exists($scop_output)
+		and ZBH::Local::is_file_exists($pdb50_output)
+		and ZBH::Local::is_file_exists($pdb90_output) ) {
+		return ("done");
+	}
+
+	return ("ready");
+}
+
+exit(
+	not print(
+		main(
+			"$FindBin::Bin/../../etc/10buildclust.conf",
+			"$FindBin::Bin/../../etc/logging.conf"
+		)
+	)
+);

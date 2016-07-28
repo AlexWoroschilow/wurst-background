@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+# Copyright 2015 Alex Woroschilow (alex.woroschilow@gmail.com)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+use v5.10;
+use FindBin;
+use lib "$FindBin::Bin/../../lib/perl";
+use ZBH::SGE;
+use ZBH::Local;
+use ZBH::Flensburg;
+
+use Config::Simple;
+use Log::Log4perl;
+
+sub main {
+	my $file    = shift;
+	my $logging = shift;
+
+	my $calculator = shift;
+
+	Log::Log4perl->init($logging);
+	my $logger = Log::Log4perl->get_logger("40statistic");
+
+	my $config = new Config::Simple($file);
+	
+	my $settings_output = $config->param("settings.output");
+	$logger->info( "settings.output: ", $settings_output );
+	if ( ZBH::Local::is_file_exists($settings_output) ) {
+		$logger->info("output file found: $settings_output");
+		return ("done");
+	}
+
+	if ( ZBH::SGE::in_background($calculator) ) {
+		$logger->info( "process in background: ", $calculator );
+		return ("wait");
+	}
+
+	ZBH::SGE::start( "qsub -S /usr/bin/perl -wd $FindBin::Bin/calculator -q 16c.q,32c.q $calculator" );
+
+	return ("wait");
+}
+
+exit(
+	not print(
+		main(
+			"$FindBin::Bin/../../etc/40statistic.conf",
+			"$FindBin::Bin/../../etc/logging.conf",
+			"$FindBin::Bin/calculator/statistic.sh",
+		)
+	)
+);

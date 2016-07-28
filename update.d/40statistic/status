@@ -1,0 +1,117 @@
+#!/usr/bin/perl
+# Copyright 2015 Alex Woroschilow (alex.woroschilow@gmail.com)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+use FindBin;
+use lib "$FindBin::Bin/../../lib/perl";
+use ZBH::SGE;
+use ZBH::Local;
+use ZBH::Flensburg;
+
+use Config::Simple;
+use Log::Log4perl;
+
+sub main {
+	my $file    = shift;
+	my $logging = shift;
+
+	my $server  = shift;
+	my $planner = shift;
+	my $worker  = shift;
+
+	Log::Log4perl->init($logging);
+	my $logger = Log::Log4perl->get_logger("40statistic");
+
+	my $config = new Config::Simple($file);
+
+	my $cath_eval = $config->param("cath.eval");
+	$logger->info( "cath.eval: ", $cath_eval );
+	my $cath_clust = $config->param("cath.clust");
+	$logger->info( "cath.clust: ", $cath_clust );
+	if ( not ZBH::Local::is_file_exists($cath_eval) ) {
+		$logger->fatal("eval file not found: $cath_eval");
+		return ("error");
+	}
+	if ( not ZBH::Local::is_file_exists($cath_clust) ) {
+		$logger->fatal("clust file not found: $cath_clust");
+		return ("error");
+	}
+
+	my $scop_eval = $config->param("scop.eval");
+	$logger->info( "scop.eval: ", $scop_eval );
+	my $scop_clust = $config->param("scop.clust");
+	$logger->info( "scop.clust: ", $scop_clust );
+	if ( not ZBH::Local::is_file_exists($scop_eval) ) {
+		$logger->fatal("eval file not found: $scop_eval");
+		return ("error");
+	}
+	if ( not ZBH::Local::is_file_exists($scop_clust) ) {
+		$logger->fatal("clust file not found: $scop_clust");
+		return ("error");
+	}
+
+	my $pdb50_eval = $config->param("pdb50.eval");
+	$logger->info( "pdb50.eval: ", $pdb50_eval );
+	my $pdb50_clust = $config->param("pdb50.clust");
+	$logger->info( "pdb50.clust: ", $pdb50_clust );
+	if ( not ZBH::Local::is_file_exists($pdb50_eval) ) {
+		$logger->fatal("eval file not found: $pdb50_eval");
+		return ("error");
+	}
+	if ( not ZBH::Local::is_file_exists($pdb50_clust) ) {
+		$logger->fatal("eval file not found: $pdb50_clust ");
+		return ("error");
+	}
+
+	my $pdb90_eval = $config->param("pdb90.eval");
+	$logger->info( "pdb90.eval: ", $pdb90_eval );
+	my $pdb90_clust = $config->param("pdb90.clust");
+	$logger->info( "pdb90.clust: ", $pdb90_clust );
+	if ( not ZBH::Local::is_file_exists($pdb90_eval) ) {
+		$logger->fatal("eval file not found: $pdb90_eval");
+		return ("error");
+	}
+	if ( not ZBH::Local::is_file_exists($pdb90_clust) ) {
+		$logger->fatal("clust file not found: $pdb90_clust ");
+		return ("error");
+	}
+
+	my $salami_eval = $config->param("salami.eval");
+	$logger->info( "salami.eval: ", $salami_eval );
+	my $salami_clust = $config->param("salami.clust");
+	$logger->info( "salami.clust: ", $salami_clust );
+	if ( not ZBH::Local::is_file_exists($salami_eval) ) {
+		$logger->fatal("eval file not found: $salami_eval");
+		return ("error");
+	}
+	if ( not ZBH::Local::is_file_exists($salami_clust) ) {
+		$logger->fatal("clust file not found: $salami_clust ");
+		return ("error");
+	}
+	
+	my $settings_output = $config->param("settings.output");
+	$logger->info( "settings.output: ", $settings_output );
+	if ( ZBH::Local::is_file_exists($settings_output) ) {
+		$logger->info("output file found: $settings_output");
+		return ("done");
+	}
+
+	return ("ready");
+}
+
+exit(
+	not print(
+		main(
+			"$FindBin::Bin/../../etc/40statistic.conf",
+			"$FindBin::Bin/../../etc/logging.conf"
+		)
+	)
+);

@@ -15,35 +15,18 @@ use strict;
 use warnings;
 use Data::Dump qw( dump pp );
 
-sub is_file_exists {
-	my $file = shift;
-	return ( ( -d $file ) || ( -e $file ) );
+sub start ($) {
+    my $command = shift;    
+    system("nohup $command >/dev/null 2>&1 &");
 }
 
-sub is_background_process ($) {
+
+sub in_background($) {
 	my $starter = shift;
 	my $name = substr( $starter, rindex( $starter, "/" ) + 1 );
-
 	my $result = `qstat -r -ext 2>/dev/null`;
-
 	return ( index( $result, $name ) > -1 );
 }
-
-sub is_background_process_sge ($) {
-	my $starter = shift;
-	return is_background_process($starter);
-}
-
-
-sub is_background_process_started_sge ($) {
-	my $starter = shift;
-	my $name = substr( $starter, rindex( $starter, "/" ) + 1 );
-
-	my $result = `qstat -r -s r -ext 2>/dev/null`;
-
-	return ( index( $result, $name ) > -1 );
-}
-
 
 sub is_background_process_done ($ $) {
 	my $logfile   = shift;
@@ -64,7 +47,5 @@ sub is_background_process_status ($ $) {
 	my $result = `tail -n 2 $logfile`;
 	return ( index( $result, $keystring ) > -1 );
 }
-
-1;
 
 1;

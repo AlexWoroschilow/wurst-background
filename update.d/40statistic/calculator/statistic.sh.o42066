@@ -1,0 +1,7 @@
+name;size;max;tm_score;seq_id;rmsd;cath;scop;pdb50;pdb90;salami
+cath;2732;13613;tm_score;seq_id;rmsd;cath;scop;pdb50;pdb90;salami
+scop;2732;15801;tm_score;seq_id;rmsd;cath;scop;pdb50;pdb90;salami
+pdb50;26794;3755;tm_score;seq_id;rmsd;cath;scop;pdb50;pdb90;salami
+pdb90;39397;2780;tm_score;seq_id;rmsd;cath;scop;pdb50;pdb90;salami
+salami;41511;99;tm_score;seq_id;rmsd;cath;scop;pdb50;0.449303509667417;salami
+wait
