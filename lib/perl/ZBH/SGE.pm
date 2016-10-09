@@ -9,6 +9,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+use v5.10;
 package ZBH::SGE;
 @EXPORT    = qw(is_background_process is_background_process_sge is_background_process_started_sge is_background_process_done is_background_process_status);
 use strict;
@@ -47,12 +48,13 @@ sub is_background_process_started_sge ($) {
 
 sub is_background_process_done ($ $) {
 	my $logfile   = shift;
-	my $keystring = shift;
+	my $pattern = shift;
 
 	return 0 if (not is_file_exists($logfile));	
 
 	my $result = `tail -n 2 $logfile 2>/dev/null`;
-	return ( index( $result, $keystring ) > -1 );
+	return 0 if (not length($result));
+	return ($result =~ $pattern);
 }
 
 sub is_background_process_status ($ $) {
