@@ -24,6 +24,7 @@ sub main {
   Log::Log4perl->init(shift);
   my $config_structure = shift;  
   my $config_sequence = shift;
+  my $starter = shift;  
   
   my $date = time;
   
@@ -57,7 +58,6 @@ sub main {
     return ("error");
   }
 
-  my $starter = "$FindBin::Bin/wurstimbiss.sh";
   if (not ZBH::Local::is_file_exists($starter)) {
     $logger->fatal("Can not start task, can not find config file: $starter");
     return ("error");
@@ -84,6 +84,7 @@ exit(
       "$FindBin::Bin/../../etc/logging.conf",
       "$FindBin::Bin/../../etc/25buildimbiss.str.conf",
       "$FindBin::Bin/../../etc/25buildimbiss.seq.conf",
+      "$FindBin::Bin/wurstimbiss.sh",
     ) 
   ) 
 );

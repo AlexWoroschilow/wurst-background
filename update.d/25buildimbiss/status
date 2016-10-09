@@ -10,6 +10,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+use v5.10;
 use warnings;
 
 use FindBin;
@@ -35,6 +36,8 @@ sub main {
   Log::Log4perl->init(shift);
   my $config_structure = shift;  
   my $config_sequence = shift;
+  my $seqlog = shift;
+  my $strlog = shift;
 
   my $config  = new Config::Simple($file);
   my $logger  = Log::Log4perl->get_logger("25buildimbiss");
@@ -72,31 +75,40 @@ sub main {
     return("error");
   }
 	
+	
   if (ZBH::Local::is_file_exists($result_sequence) 
     and ZBH::Local::is_file_exists($result_structure)) {
-      $logger->info( "Result sequence found: ", $result_sequence);
-      $logger->info( "Result structure found: ", $result_structure);
-      
-      my $keystring = "100.000000 %";
-      my $seqlog = "$FindBin::Bin/../../log/sequence.log";
-      my $strlog = "$FindBin::Bin/../../log/structure.log";
-      
-      if(ZBH::SGE::is_background_process_done($seqlog, $keystring) 
-	and ZBH::SGE::is_background_process_done($strlog, $keystring)) {
-	  $logger->info( "Remove logfile: ", $seqlog);
-	  $logger->info( "Remove logfile: ", $strlog);
-	  
-	  unlink($seqlog);
-	  unlink($strlog);
-	  
-	  $logger->info( "Done");
-	  return ("done");
-      }
-      
-      $logger->info( "Ready");
-      return("ready");
-  }	
 
+      if (ZBH::Local::is_file_exists($seqlog) 
+	and ZBH::Local::is_file_exists($strlog)) { 
+	
+	  my $keystring = /Done:\s*100.*/;
+	  # If result files are here and log files are here
+	  # and task is 100% finished, send done status
+	  if(ZBH::SGE::is_background_process_done($seqlog, $keystring) 
+	    and ZBH::SGE::is_background_process_done($strlog, $keystring)) {
+	      $logger->info( "Remove logfile: ", $seqlog);
+	      $logger->info( "Remove logfile: ", $strlog);
+	      
+	      unlink($seqlog);
+	      unlink($strlog);
+	      	      
+	      $logger->info( "Done");
+	      return ("done");
+	  }
+	  # If result files are here and log files are here
+	  # but task was not 100 % finished and there are no
+	  # sge background taks to finish it restart task
+	  $logger->info( "Ready");
+	  return("ready");
+	}
+    # If there are a result files but no log files
+    # we can be sure task is finished bacause 
+    # we remove log files only here in this script
+    $logger->info( "Done");
+    return ("done");
+  }
+    
   $logger->info( "Ready");
   return ("ready");
 }
@@ -107,7 +119,9 @@ exit(
       "$FindBin::Bin/../../etc/update.conf", 
       "$FindBin::Bin/../../etc/logging.conf" ,
       "$FindBin::Bin/../../etc/25buildimbiss.str.conf",
-      "$FindBin::Bin/../../etc/25buildimbiss.seq.conf",      
+      "$FindBin::Bin/../../etc/25buildimbiss.seq.conf",
+      "$FindBin::Bin/../../log/25buildimbiss.seq.log",
+      "$FindBin::Bin/../../log/25buildimbiss.str.log"
     ) 
   ) 
 );

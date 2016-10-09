@@ -35,7 +35,7 @@ if __name__ == "__main__":
     format = '[%(relativeCreated)d][%(name)s] %(levelname)s - %(message)s'
     logging.basicConfig( level=options.loglevel, format=format)
 
-    handler = RotatingFileHandler(filename=options.logfile, maxBytes=(1024 * 100), backupCount=3)
+    handler = RotatingFileHandler(filename=options.logfile, maxBytes=(1024 * 100000), backupCount=3)
     handler.setFormatter(logging.Formatter(format))
 
     logger = logging.getLogger('queue')
