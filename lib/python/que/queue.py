@@ -107,6 +107,7 @@ class TaskRunner(object):
             self._logger.debug("start - %s" % script)        
             self.status, stderrdata = process.communicate()
             self._logger.debug("%s - %s" % (self.status, script))
+            self._logger.debug("%s - %s" % (stderrdata, script))
             return True
         self._logger.error("can not start script: %s " % script)
         return False
