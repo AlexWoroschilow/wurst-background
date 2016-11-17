@@ -37,10 +37,6 @@ sub main {
     my $config  = new Config::Simple($file);
     my $logger  = Log::Log4perl->get_logger("11buildseq");
 
-  my $flensburg = ZBH::Flensburg->new($logger);
-  $flensburg->info("test", "Just simple test", "");  
-
-
     my $alphabet = $config->param("11buildseq.alphabet");
     $logger->info( "11buildseq.alphabet: ", $alphabet );    
     if(not ZBH::Local::is_file_exists( $alphabet)) {    
