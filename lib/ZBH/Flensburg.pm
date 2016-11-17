@@ -24,9 +24,9 @@ sub new {
     my $class = shift;
 
     my $self = {
-        logger => shift,
-        host => "flensburg",
-        user => "wurst"
+        _logger => shift,
+        _host => "flensburg",
+        _user => "wurst"
     };
     
 	bless( $self, $class );
@@ -50,13 +50,13 @@ sub failure($ $ $ $) {
 		$task_status_error, $task_status_fatal, $task_status_log,
 	);
 
-	$self->{logger}->debug("Failure fatal file to flensburg: $file");
-	if ( transport_to_flensburg($file) ) {
-		$self->{logger}->debug('Failure file sent to flensburg: $file');
+	$self->{_logger}->debug("Failure fatal file to flensburg: $file");
+	if ( $self->transport_to_flensburg($file) ) {
+		$self->{_logger}->debug('Failure file sent to flensburg: $file');
 		unlink($file);
 		return 1;
 	}
-	$self->{logger}->debug('Failure file does not sent: $file');
+	$self->{_logger}->debug('Failure file does not sent: $file');
 	return 0;
 }
 
@@ -75,13 +75,13 @@ sub fatal($ $ $ $) {
 		$task_status_error, $task_status_fatal, $task_status_log,
 	);
 
-	$self->{logger}->debug("Sending fatal file to flensburg: $file");
-	if ( transport_to_flensburg($file) ) {
-		$self->{logger}->debug('Fatal file sent to flensburg: $file');
+	$self->{_logger}->debug("Sending fatal file to flensburg: $file");
+	if ( $self->transport_to_flensburg($file) ) {
+		$self->{_logger}->debug('Fatal file sent to flensburg: $file');
 		unlink($file);
 		return 1;
 	}
-	$self->{logger}->debug('Fatal file does not sent: $file');
+	$self->{_logger}->debug('Fatal file does not sent: $file');
 	return 0;
 }
 
@@ -101,13 +101,13 @@ sub success($ $ $ $) {
 		$task_status_error, $task_status_fatal, $task_status_log,
 	);
 
-	$self->{logger}->debug("Sending success file to flensburg: $file");
-	if ( transport_to_flensburg($file) ) {
-		$self->{logger}->debug('Success file sent to flensburg: $file');
+	$self->{_logger}->debug("Sending success file to flensburg: $file");
+	if ( $self->transport_to_flensburg($file) ) {
+		$self->{_logger}->debug('Success file sent to flensburg: $file');
 		unlink($file);
 		return 1;
 	}
-	$self->{logger}->debug('Success file does not sent: $file');
+	$self->{_logger}->debug('Success file does not sent: $file');
 	return 0;
 }
 
@@ -126,13 +126,13 @@ sub pending($ $ $ $) {
 		$task_status_error, $task_status_fatal, $task_status_log,
 	);
 
-	$self->{logger}->debug("Sending pending file to flensburg: $file");
-	if ( transport_to_flensburg($file) ) {
-		$self->{logger}->debug('Pending file sent to flensburg: $file');
+	$self->{_logger}->debug("Sending pending file to flensburg: $file");
+	if ( $self->transport_to_flensburg($file) ) {
+		$self->{_logger}->debug('Pending file sent to flensburg: $file');
 		unlink($file);
 		return 1;
 	}
-	$self->{logger}->debug('Pending file does not sent: $file');
+	$self->{_logger}->debug('Pending file does not sent: $file');
 	return 0;
 }
 
@@ -151,13 +151,13 @@ sub info($ $ $ $) {
 		$task_status_error, $task_status_fatal, $task_status_log,
 	);
 
-	$self->{logger}->debug("Sending info file to flensburg: $file");
-	if ( transport_to_flensburg($file) ) {
-		$self->{logger}->debug('Info file sent to flensburg: $file');
+	$self->{_logger}->debug("Sending info file to flensburg: $file");
+	if ( $self->transport_to_flensburg($file) ) {
+		$self->{_logger}->debug('Info file sent to flensburg: $file');
 		unlink($file);
 		return 1;
 	}
-	$self->{logger}->debug('Info file does not sent: $file');
+	$self->{_logger}->debug('Info file does not sent: $file');
 	return 0;
 }
 
@@ -168,12 +168,12 @@ sub transport_to_flensburg ($ $ ) {
 	my $source = shift;
 	my $date   = time;
 
-	my $scp = Net::SCP->new( $self->{host}, $self->{user} );
+	my $scp = Net::SCP->new( $self->{_host}, $self->{_user} );
 	if($scp->put( $source, "/home/other/wurst/wurst_rss/xml/status-$date.xml")) {
-		$self->{logger}->info("Status file sent: " . $self->{host} . "@" .$self->{user});
+		$self->{_logger}->info("Status file sent: " . $self->{_host} . "@" .$self->{_user});
 		return 1;
 	}
-	$self->{logger}->error("Status file sent: ". $self->{host} . "@" .$self->{user});
+	$self->{_logger}->error("Status file sent: ". $self->{_host} . "@" .$self->{_user});
 	return 0;
 }
 
