@@ -171,10 +171,10 @@ sub transport_to_flensburg ($ $ ) {
 	
 	my $scp = Net::SCP->new( $self->{host}, $self->{user} );
 	if($scp->put( $source, "/home/other/wurst/wurst_rss/xml/status-$date.xml")) {
-		$self->{logger}->info('Status file sent: $user@$host');
+		$self->{logger}->info("Status file sent: " . $self->{host} . "@" .$self->{user});
 		return 1;
 	}
-	$self->{logger}->error('Status file sent: $user@$host');
+	$self->{logger}->error("Status file sent: ". $self->{host} . "@" .$self->{user});
 	return 0;
 }
 
