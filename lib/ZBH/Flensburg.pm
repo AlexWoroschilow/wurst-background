@@ -52,11 +52,11 @@ sub failure($ $ $ $) {
 
 	$self->{_logger}->debug("Failure fatal file to flensburg: $file");
 	if ( $self->transport_to_flensburg($file) ) {
-		$self->{_logger}->debug('Failure file sent to flensburg: $file');
+		$self->{_logger}->debug("Failure file sent to flensburg: $file");
 		unlink($file);
 		return 1;
 	}
-	$self->{_logger}->error('Failure file does not sent: $file');
+	$self->{_logger}->error("Failure file does not sent: $file");
 	return 0;
 }
 
@@ -77,11 +77,11 @@ sub fatal($ $ $ $) {
 
 	$self->{_logger}->debug("Sending fatal file to flensburg: $file");
 	if ( $self->transport_to_flensburg($file) ) {
-		$self->{_logger}->debug('Fatal file sent to flensburg: $file');
+		$self->{_logger}->debug("Fatal file sent to flensburg: $file");
 		unlink($file);
 		return 1;
 	}
-	$self->{_logger}->error('Fatal file does not sent: $file');
+	$self->{_logger}->error("Fatal file does not sent: $file");
 	return 0;
 }
 
@@ -103,11 +103,11 @@ sub success($ $ $ $) {
 
 	$self->{_logger}->debug("Sending success file to flensburg: $file");
 	if ( $self->transport_to_flensburg($file) ) {
-		$self->{_logger}->debug('Success file sent to flensburg: $file');
+		$self->{_logger}->debug("Success file sent to flensburg: $file");
 		unlink($file);
 		return 1;
 	}
-	$self->{_logger}->error('Success file does not sent: $file');
+	$self->{_logger}->error("Success file does not sent: $file");
 	return 0;
 }
 
@@ -128,11 +128,11 @@ sub pending($ $ $ $) {
 
 	$self->{_logger}->debug("Sending pending file to flensburg: $file");
 	if ( $self->transport_to_flensburg($file) ) {
-		$self->{_logger}->debug('Pending file sent to flensburg: $file');
+		$self->{_logger}->debug("Pending file sent to flensburg: $file");
 		unlink($file);
 		return 1;
 	}
-	$self->{_logger}->error('Pending file does not sent: $file');
+	$self->{_logger}->error("Pending file does not sent: $file");
 	return 0;
 }
 
@@ -168,12 +168,15 @@ sub transport_to_flensburg ($ $ ) {
 	my $source = shift;
 	my $date   = time;
 
-	my $scp = Net::SCP->new( $self->{_host}, $self->{_user} );
+    my $host = $self->{_host};
+    my $user = $self->{_user};
+   
+	my $scp = Net::SCP->new( $host, $user );
 	if($scp->put( $source, "/home/other/wurst/wurst_rss/xml/status-$date.xml")) {
-		$self->{_logger}->info("Status file sent: " . $self->{_host} . "@" .$self->{_user});
+		$self->{_logger}->info("Status file sent: $host@$user");
 		return 1;
 	}
-	$self->{_logger}->error($self->{_host} . "@" .$self->{_user} . ": " . $scp->{errstr});
+	$self->{_logger}->error("$host@$user: " . $scp->{errstr});
 	return 0;
 }
 
