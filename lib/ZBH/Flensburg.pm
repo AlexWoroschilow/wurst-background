@@ -153,11 +153,11 @@ sub info($ $ $ $) {
 
 	$self->{_logger}->debug("Sending info file to flensburg: $file");
 	if ( $self->transport_to_flensburg($file) ) {
-		$self->{_logger}->debug('Info file sent to flensburg: $file');
+		$self->{_logger}->debug("Info file sent to flensburg: $file");
 		unlink($file);
 		return 1;
 	}
-	$self->{_logger}->error('Info file does not sent: $file');
+	$self->{_logger}->error("Info file does not sent: $file");
 	return 0;
 }
 
@@ -173,7 +173,7 @@ sub transport_to_flensburg ($ $ ) {
 		$self->{_logger}->info("Status file sent: " . $self->{_host} . "@" .$self->{_user});
 		return 1;
 	}
-	$self->{_logger}->error("Status file does not sent: ". $self->{_host} . "@" .$self->{_user});
+	$self->{_logger}->error($scp->{errstr});
 	return 0;
 }
 
