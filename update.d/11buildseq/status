@@ -38,7 +38,7 @@ sub main {
     my $logger  = Log::Log4perl->get_logger("11buildseq");
 
   my $flensburg = ZBH::Flensburg->new($logger);
-  $flensburg->info("test", "Just simple test");  
+  $flensburg->info("test", "Just simple test", "");  
 
 
     my $alphabet = $config->param("11buildseq.alphabet");
