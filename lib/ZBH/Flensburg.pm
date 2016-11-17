@@ -13,7 +13,6 @@ package ZBH::Flensburg;
 
 @EXPORT = qw(failure);
 
-use strict;
 use warnings;
 use Data::Dump qw( dump pp );
 
@@ -168,7 +167,7 @@ sub transport_to_flensburg ($ $ ) {
 	my $self = shift;
 	my $source = shift;
 	my $date   = time;
-	print($self->{host});
+
 	my $scp = Net::SCP->new( $self->{host}, $self->{user} );
 	if($scp->put( $source, "/home/other/wurst/wurst_rss/xml/status-$date.xml")) {
 		$self->{logger}->info("Status file sent: " . $self->{host} . "@" .$self->{user});
