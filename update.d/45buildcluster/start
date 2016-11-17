@@ -67,7 +67,8 @@ sub main {
   $logger->info("Start: $worker $structure_graph $structure_cluster");
   ZBH::Local::background("qsub -S /bin/bash -wd $FindBin::Bin $worker $structure_graph $structure_cluster");
 
-  ZBH::Flensburg::info($logger, "45buildcluster", "Script starter report",
+  my $flensburg = ZBH::Flensburg->new($logger);
+  $flensburg->info("45buildcluster", "Script starter report",
     "Script: $worker started \n convert graph: $sequence_graph to  cluster: $sequence_cluster \n" . 
     "Script: $worker started \n convert graph: $structure_graph to  cluster: $structure_cluster \n"
   );

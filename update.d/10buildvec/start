@@ -86,7 +86,8 @@ sub main {
     $logger->info("Start: ", $planner );
     ZBH::Local::background("qsub -S /bin/bash -wd $FindBin::Bin $planner $file $logging");
     
-    ZBH::Flensburg::info($logger, "10buildvec", "Task starter report",
+    my $flensburg = ZBH::Flensburg->new($logger);
+    $flensburg->info("10buildvec", "Task starter report",
       "Script: $starter started at: $date"
     );
     

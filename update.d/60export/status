@@ -26,7 +26,8 @@ sub fatal($ $) {
   my $message = shift;
   
   $logger->fatal($message);
-  ZBH::Flensburg::fatal($logger, "60export", "Can not start task", $message);  
+  my $flensburg = ZBH::Flensburg->new($logger);
+  $flensburg->fatal("60export", "Can not start task", $message);  
 }
 
 sub main {

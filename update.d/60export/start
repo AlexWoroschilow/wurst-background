@@ -52,7 +52,8 @@ sub main {
   $logger->info("Create folder: $source" );
   make_path("$source") or return ("error");
 
-  ZBH::Flensburg::success($logger, "60export", "Data exporter report",
+  my $flensburg = ZBH::Flensburg->new($logger);
+  $flensburg->success("60export", "Data exporter report",
     "You can find all files here: $destination"
   );
 

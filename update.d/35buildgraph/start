@@ -91,7 +91,8 @@ sub main {
 	close(GRAPH);
 	close(INPUT);
 
-	ZBH::Flensburg::success($logger, "35buildgraph", "Data exporter report",
+	my $flensburg = ZBH::Flensburg->new($logger);
+    $flensburg->success("35buildgraph", "Data exporter report",
 	  "Data exported to: $graph1\n Data exported to: $graph2\n"
 	);
 
