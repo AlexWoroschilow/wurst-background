@@ -173,7 +173,7 @@ sub transport_to_flensburg ($ $ ) {
 		$self->{_logger}->info("Status file sent: " . $self->{_host} . "@" .$self->{_user});
 		return 1;
 	}
-	$self->{_logger}->error($scp->{errstr});
+	$self->{_logger}->error($self->{_host} . "@" .$self->{_user} . ": " . $scp->{errstr});
 	return 0;
 }
 
