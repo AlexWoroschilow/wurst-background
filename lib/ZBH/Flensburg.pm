@@ -56,7 +56,7 @@ sub failure($ $ $ $) {
 		unlink($file);
 		return 1;
 	}
-	$self->{_logger}->debug('Failure file does not sent: $file');
+	$self->{_logger}->error('Failure file does not sent: $file');
 	return 0;
 }
 
@@ -81,7 +81,7 @@ sub fatal($ $ $ $) {
 		unlink($file);
 		return 1;
 	}
-	$self->{_logger}->debug('Fatal file does not sent: $file');
+	$self->{_logger}->error('Fatal file does not sent: $file');
 	return 0;
 }
 
@@ -107,7 +107,7 @@ sub success($ $ $ $) {
 		unlink($file);
 		return 1;
 	}
-	$self->{_logger}->debug('Success file does not sent: $file');
+	$self->{_logger}->error('Success file does not sent: $file');
 	return 0;
 }
 
@@ -132,7 +132,7 @@ sub pending($ $ $ $) {
 		unlink($file);
 		return 1;
 	}
-	$self->{_logger}->debug('Pending file does not sent: $file');
+	$self->{_logger}->error('Pending file does not sent: $file');
 	return 0;
 }
 
@@ -157,7 +157,7 @@ sub info($ $ $ $) {
 		unlink($file);
 		return 1;
 	}
-	$self->{_logger}->debug('Info file does not sent: $file');
+	$self->{_logger}->error('Info file does not sent: $file');
 	return 0;
 }
 
@@ -173,7 +173,7 @@ sub transport_to_flensburg ($ $ ) {
 		$self->{_logger}->info("Status file sent: " . $self->{_host} . "@" .$self->{_user});
 		return 1;
 	}
-	$self->{_logger}->error("Status file sent: ". $self->{_host} . "@" .$self->{_user});
+	$self->{_logger}->error("Status file does not sent: ". $self->{_host} . "@" .$self->{_user});
 	return 0;
 }
 
