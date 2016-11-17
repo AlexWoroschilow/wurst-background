@@ -169,7 +169,7 @@ sub transport_to_flensburg ($ $ ) {
 	my $source = shift;
 	my $date   = time;
 	
-	my $scp = Net::SCP->new( $self->{host}, $self->{user} );
+	my $scp = Net::SCP->new( $self->{"host"}, $self->{"user"} );
 	if($scp->put( $source, "/home/other/wurst/wurst_rss/xml/status-$date.xml")) {
 		$self->{logger}->info("Status file sent: " . $self->{host} . "@" .$self->{user});
 		return 1;
