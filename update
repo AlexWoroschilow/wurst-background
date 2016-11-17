@@ -10,20 +10,168 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import os 
-import sys
+import os
+import re
+import glob
+import subprocess
 import logging
 from logging.handlers import RotatingFileHandler
-
 from optparse import OptionParser
 
-root = os.path.dirname(os.path.realpath(__file__))
 
-sys.path.append("%s/lib/python" % root)
+class Task(object):
+    _logger = None
+    _path = None
 
-from que.queue import Queue
+    def __init__(self, logger, path):
+        self._path = path
+        self._logger = logger
+        self._logger.debug(path)
+
+    @property
+    def priority(self):
+        priorities = re.findall(r'\d+', self.name)
+        if priorities is not None:
+            return priorities.pop()
+        return None
+
+    @property
+    def path(self):
+        return self._path
+
+    @property
+    def start(self):
+        return "%s/start" % self.path
+
+    @property
+    def status(self):
+        return "%s/status" % self.path
+
+    @property
+    def name(self):
+        return self.path[self.path.rfind('/') + 1:]
+
+    def __eq__(self, other):
+        return self.priority == other.priority
+
+    def __ne__(self, other):
+        return self.priority != other.priority
+
+    def __gt__(self, other):
+        return self.priority > other.priority
+
+    def __ge__(self, other):
+        return self.priority >= other.priority
+
+    def __le__(self, other):
+        return self.priority <= other.priority
+
+    def __str__(self):
+        return self.name
+
+
+class TaskRunner(object):
+    _logger = None
+    _status = None
+    _task = None
+
+    def __init__(self, logger, task):
+        self._task = task
+        self._logger = logger
+        self._logger.debug(task.name)
+
+    @property
+    def status(self):
+        return self._status
+
+    @status.setter
+    def status(self, value):
+        self._status = value.decode('utf-8')
+
+    @property
+    def is_done(self):
+        return self.status.find('done') != -1
+
+    @property
+    def is_ready(self):
+        return self.status.find('ready') != -1 
+
+    @property
+    def is_wait(self):
+        return self.status.find('wait') != -1
+
+    @property
+    def is_error(self):
+        return self.status.find('error') != -1
+
+    def _start(self, script):
+        with subprocess.Popen([script], stdout=subprocess.PIPE) as process:
+            self._logger.debug("start - %s" % script)
+            self.status, stderrdata = process.communicate()
+            self._logger.debug("%s - %s" % (self.status, script))
+            self._logger.debug("%s - %s" % (stderrdata, script))
+            return True
+        self._logger.error("can not start script: %s " % script)
+        return False
+
+    def start(self):
+        for script in [self._task.status, self._task.start]:
+            if self._start(script):
+                if self.is_ready:
+                    continue
+                if self.is_error or self.is_wait:
+                    return False
+                if self.is_done:
+                    return True
+            return False
+        return True
+
+
+class Queue(object):
+    _path = None
+    _logger = None
+
+    def __init__(self, logger, path):
+        self._path = path
+        self._logger = logger
+        self._logger.debug("folder with tasks: %s" % path)
+
+    @property
+    def tasks(self):
+        for task in glob.glob(self._path):
+            yield Task(self._logger, task)
+
+    def queue(self):
+        collection = [task for task in self.tasks]
+        collection.sort(reverse=False)
+        for task in collection:
+            print(task)
+
+    def start(self, name=None):
+        if name is not None:
+            return self.start_task(name)
+
+        collection = [task for task in self.tasks]
+        collection.sort(reverse=False)
+        for task in collection:
+            self._logger.debug("%s - start" % task.name)
+            process = TaskRunner(self._logger, task)
+            status = process.start()
+            self._logger.info("%s - %s" % (task.name, process.status))
+            if not status:
+                break
+
+    def start_task(self, name=None):
+        for task in self.tasks:
+            if task.name == name:
+                self._logger.info(name)
+                process = TaskRunner(self._logger, task)
+                return process.start()
+
 
 if __name__ == "__main__":
+    root = os.path.dirname(os.path.realpath(__file__))
+
     parser = OptionParser()
     parser.add_option("-q", "--queue", action="store_true", default=False, dest="queue", help="show tasks")
     parser.add_option("-t", "--task", default=None, dest="task", help="run task by name")
@@ -32,15 +180,15 @@ if __name__ == "__main__":
 
     (options, args) = parser.parse_args()
 
-    format = '[%(relativeCreated)d][%(name)s] %(levelname)s - %(message)s'
-    logging.basicConfig( level=options.loglevel, format=format)
+    logformat = '[%(relativeCreated)d][%(name)s] %(levelname)s - %(message)s'
+    logging.basicConfig(level=options.loglevel, format=logformat)
 
     handler = RotatingFileHandler(filename=options.logfile, maxBytes=(1024 * 100000), backupCount=3)
-    handler.setFormatter(logging.Formatter(format))
+    handler.setFormatter(logging.Formatter(logformat))
 
     logger = logging.getLogger('queue')
-    logger.addHandler(handler)      
-      
+    logger.addHandler(handler)
+
     queue = Queue(logger, "%s/update.d/*" % root)
     queue.queue() if options.queue \
         else queue.start(options.task)

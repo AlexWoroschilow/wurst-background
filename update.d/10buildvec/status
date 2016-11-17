@@ -14,7 +14,7 @@ use warnings;
 
 use FindBin;
 use lib "/work/public/bm/salamiServer";
-use lib "$FindBin::Bin/../../lib/perl";
+use lib "$FindBin::Bin/../../lib";
 
 use ZBH::SGE;
 use ZBH::Local;
