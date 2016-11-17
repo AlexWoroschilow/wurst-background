@@ -21,7 +21,8 @@ use FindBin;
 use lib "$FindBin::Bin/..";
 use Net::SCP qw(scp iscp);
 
-sub failure($ $ $) {
+sub failure($ $ $ $) {
+	my $logger			   = shift;
 	my $task_name          = shift;
 	my $task_status        = "failure";
 	my $task_status_notice = shift;
@@ -35,15 +36,18 @@ sub failure($ $ $) {
 		$task_status_error, $task_status_fatal, $task_status_log,
 	);
 
+	$logger->debug("Failure fatal file to flensburg: $file");
 	if ( transport_to_flensburg($file) ) {
+		$logger->debug('Failure file sent to flensburg: $file');
 		unlink($file);
 		return 1;
 	}
-	
+	$logger->debug('Failure file does not sent: $file');
 	return 0;
 }
 
-sub fatal($ $ $) {
+sub fatal($ $ $ $) {
+	my $logger			   = shift;
 	my $task_name          = shift;
 	my $task_status        = "fatal";
 	my $task_status_notice = shift;
@@ -57,16 +61,19 @@ sub fatal($ $ $) {
 		$task_status_error, $task_status_fatal, $task_status_log,
 	);
 
+	$logger->debug("Sending fatal file to flensburg: $file");
 	if ( transport_to_flensburg($file) ) {
+		$logger->debug('Fatal file sent to flensburg: $file');
 		unlink($file);
 		return 1;
 	}
-	
+	$logger->debug('Fatal file does not sent: $file');
 	return 0;
 }
 
 
-sub success($ $ $) {
+sub success($ $ $ $) {
+	my $logger			   = shift;
 	my $task_name          = shift;
 	my $task_status        = "success";
 	my $task_status_notice = shift;
@@ -80,15 +87,18 @@ sub success($ $ $) {
 		$task_status_error, $task_status_fatal, $task_status_log,
 	);
 
+	$logger->debug("Sending success file to flensburg: $file");
 	if ( transport_to_flensburg($file) ) {
+		$logger->debug('Success file sent to flensburg: $file');
 		unlink($file);
 		return 1;
 	}
-	
+	$logger->debug('Success file does not sent: $file');
 	return 0;
 }
 
-sub pending($ $ $) {
+sub pending($ $ $ $) {
+	my $logger			   = shift;
 	my $task_name          = shift;
 	my $task_status        = "pending";
 	my $task_status_notice = shift;
@@ -102,15 +112,18 @@ sub pending($ $ $) {
 		$task_status_error, $task_status_fatal, $task_status_log,
 	);
 
+	$logger->debug("Sending pending file to flensburg: $file");
 	if ( transport_to_flensburg($file) ) {
+		$logger->debug('Pending file sent to flensburg: $file');
 		unlink($file);
 		return 1;
 	}
-	
+	$logger->debug('Pending file does not sent: $file');
 	return 0;
 }
 
-sub info($ $ $) {
+sub info($ $ $ $) {
+	my $logger			   = shift;
 	my $task_name          = shift;
 	my $task_status        = "info";
 	my $task_status_notice = shift;
@@ -124,26 +137,33 @@ sub info($ $ $) {
 		$task_status_error, $task_status_fatal, $task_status_log,
 	);
 
-	if ( transport_to_flensburg($file) ) {
+	$logger->debug("Sending info file to flensburg: $file");
+	if ( transport_to_flensburg($logger, $file) ) {
+		$logger->debug('Info file sent to flensburg: $file');
 		unlink($file);
 		return 1;
 	}
-	
+	$logger->debug('Info file does not sent: $file');
 	return 0;
 }
 
 
 
-sub transport_to_flensburg {
-
+sub transport_to_flensburg ($ $ ) {
+	my $logger = shift;
 	my $source = shift;
 	my $date   = time;
 
-	my $scp = Net::SCP->new( "flensburg", "wurst" );
-	$scp->put( $source, "/home/other/wurst/wurst_rss/xml/status-$date.xml" )
-	  or die $scp->{errstr};
-
-	return 1;
+	my $host = "flensburg";
+	my $user = "wurst";
+	
+	my $scp = Net::SCP->new( $host, $user );
+	if($scp->put( $source, "/home/other/wurst/wurst_rss/xml/status-$date.xml")) {
+		$logger->info('Status file sent: $user@$host');
+		return 1;
+	}
+	$logger->error('Status file sent: $user@$host');
+	return 0;
 }
 
 sub response_file_xml ($ $ $ $ $ $) {
@@ -157,7 +177,7 @@ sub response_file_xml ($ $ $ $ $ $) {
 
 	my $filename = "/tmp/wurst-update-status-$task_date.xml";
 	open( my $stream, '>', $filename )
-	  or die "Could not open file '$filename' $!";
+	  or die ("Could not open file '$filename' $!");
 
 	print $stream <<"END_MESSAGE";
 <?xml version="1.1" encoding="UTF-8" ?>

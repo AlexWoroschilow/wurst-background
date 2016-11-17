@@ -36,7 +36,7 @@ sub fatal($ $) {
   my $message = shift;
   
   $logger->fatal($message);
-  ZBH::Flensburg::fatal("10buildvec", "Can not start task", $message);  
+  ZBH::Flensburg::fatal($logger, "10buildvec", "Can not start task", $message);  
 }
 
 sub main {

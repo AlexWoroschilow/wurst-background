@@ -69,7 +69,7 @@ sub main {
   $logger->info("Start: $starter $config_structure $result_structure");
   system("qsub -S /bin/bash -wd $FindBin::Bin $starter $config_structure $result_structure");
 
-  ZBH::Flensburg::info( "25buildimbiss", "Task starter report",
+  ZBH::Flensburg::info($logger, "25buildimbiss", "Task starter report",
     "Started: $starter $config_sequence $result_sequence\n".
     "Started: $starter $config_structure $result_structure\n"
   );

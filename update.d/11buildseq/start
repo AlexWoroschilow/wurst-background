@@ -86,7 +86,7 @@ sub main {
   $logger->info( "Write sequence list file: ", $sequence_collection );    
   ZBH::Local::execute("find $sequence_folder -name '*.seq' > $sequence_collection");	
 
-  ZBH::Flensburg::success( "11buildseq", "Task starter report",
+  ZBH::Flensburg::success($logger, "11buildseq", "Task starter report",
       "Generated files: $vector_collection started at: $sequence_collection"
   );
 

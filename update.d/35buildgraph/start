@@ -91,7 +91,7 @@ sub main {
 	close(GRAPH);
 	close(INPUT);
 
-	ZBH::Flensburg::success( "35buildgraph", "Data exporter report",
+	ZBH::Flensburg::success($logger, "35buildgraph", "Data exporter report",
 	  "Data exported to: $graph1\n Data exported to: $graph2\n"
 	);
 
