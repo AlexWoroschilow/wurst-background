@@ -18,17 +18,13 @@ setwd(script.path())
 source('lib/igraph.r', chdir = TRUE)
 source('lib/assert.r', chdir = TRUE)
 
-
-
 assert(!is.na((file_source = arguments[1])), "You have to define an input file, for example super_graph.ncol")
 assert(!is.na((file_result = arguments[2])), "You have to define an output file, for example super_graph.clust")
-
-filter_weight = 0.5
 
 cat(paste("read graph file:", file_source, "\n"))
 G = read.graph(file_source, format = 'ncol')
 
-G = delete.edges(G, which(E(G)$weight < filter_weight))
+G = delete.edges(G, which(E(G)$weight < 0.4))
 G = delete.edges(G, which(is.na(E(G)$weight)))
 
 G = as.undirected(G, "each")
