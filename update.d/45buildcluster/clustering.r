@@ -24,9 +24,11 @@ assert(!is.na((file_result = arguments[2])), "You have to define an output file,
 cat(paste("read graph file:", file_source, "\n"))
 G = read.graph(file_source, format = 'ncol')
 
+G = simplify(G)
 G = delete.edges(G, which(E(G)$weight < 0.4))
 G = delete.edges(G, which(is.na(E(G)$weight)))
 
+        
 G = as.undirected(G, "each")
 G = as.undirected(G, "collapse")
 
