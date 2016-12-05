@@ -28,10 +28,6 @@ G = simplify(G)
 G = delete.edges(G, which(E(G)$weight < 0.4))
 G = delete.edges(G, which(is.na(E(G)$weight)))
 
-        
-G = as.undirected(G, "each")
-G = as.undirected(G, "collapse")
-
 tryCatch({
   clsuter = cluster.leading.eigenvector.community(G)
   write(paste(clsuter$cluster, "\t", clsuter$index, "\t", clsuter$name), file = file_result)
